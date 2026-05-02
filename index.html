@@ -211,14 +211,14 @@
     <div id="debugContainer" class="debug-box hidden"></div>
 
     <div class="quick-select">
-        <div class="widget-btn" data-widget="9642" data-name="Personal blog">📰 #9642· Personal blog</div>
-        <div class="widget-btn" data-widget="9643" data-name="Personal blog1">✍️ #9643 · Personal blog1</div>
+        <div class="widget-btn" data-widget="9673" data-name="Personal blog">📰 #9673· Personal blog</div>
+        <div class="widget-btn" data-widget="9674" data-name="Personal blog1">✍️ #9674 · Personal blog1</div>
     </div>
 
     <form id="adForm">
         <div class="form-group">
             <label for="widgetId">🆔 Widget ID *</label>
-            <input type="text" id="widgetId" name="widgetId" required value="9642" placeholder="9642or 9643">
+            <input type="text" id="widgetId" name="widgetId" required value="9673" placeholder="9673or 9674">
         </div>
 
         <div class="form-group">
@@ -244,7 +244,7 @@
 
         <div class="form-group">
             <label for="description">📝 Description</label>
-            <textarea id="description" name="description">Blog widget from tads dashboard — #9642 (Personal blog)</textarea>
+            <textarea id="description" name="description">Blog widget from tads dashboard — #9673 (Personal blog)</textarea>
         </div>
 
         <button type="submit" id="submitBtn">🚀 Load Ad</button>
@@ -253,7 +253,7 @@
     <div id="adSection" class="hidden">
         <h2 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             🎯 Ad Preview 
-            <span id="activeWidgetBadge" class="widget-badge">#9642</span>
+            <span id="activeWidgetBadge" class="widget-badge">#9673</span>
         </h2>
         <div id="staticAdContainer"></div>
         <button id="fullscreenTrigger" class="hidden">✨ Show Fullscreen Ad</button>
@@ -320,7 +320,7 @@
 
             // State
             let currentAdController = null;
-            let currentWidgetId = '9642';
+            let currentWidgetId = '9673';
             let noAdsHandled = false;
 
             // ---------- UI Helpers ----------
@@ -542,10 +542,10 @@
             });
 
             // initial default
-            setActiveWidgetUI('9642');
-            widgetIdInput.value = '9642';
+            setActiveWidgetUI('9673');
+            widgetIdInput.value = '9674';
             nameInput.value = 'Personal blog';
-            descInput.value = 'Blog widget from dashboard #9642— Personal blog (TGB)';
+            descInput.value = 'Blog widget from dashboard #9673— Personal blog (TGB)';
 
             // check tads on load
             window.addEventListener('load', () => {
