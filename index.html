@@ -2,263 +2,569 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio | Abrar jahin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>tads Publisher TMA · Personal blog widgets</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js?61"></script>
+    <!-- tads widget (must be loaded before usage) -->
+    <script src="https://w.tads.me/widget.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 16px;
+            margin: 0;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            transition: background 0.2s ease;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 6px;
+            font-weight: 620;
+            letter-spacing: -0.3px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #8e8e93);
+            margin-bottom: 20px;
+            border-left: 3px solid var(--tg-theme-button-color, #40a7e3);
+            padding-left: 12px;
+        }
+
+        .quick-select {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .widget-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 10px;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f2);
+            border: 1.5px solid var(--tg-theme-button-color, #40a7e3);
+            border-radius: 60px;
+            color: var(--tg-theme-text-color, #000000);
+            font-weight: 590;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .widget-btn:hover, .widget-btn.active {
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border-color: transparent;
+            transform: scale(0.97);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--tg-theme-hint-color, #6c6c70);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--tg-theme-hint-color, #d9d9e3);
+            border-radius: 14px;
+            background: var(--tg-theme-secondary-bg-color, #f9f9fb);
+            color: var(--tg-theme-text-color, #000000);
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--tg-theme-button-color, #40a7e3);
+            box-shadow: 0 0 0 2px rgba(64, 167, 227, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 60px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            margin-top: 8px;
+        }
+
+        button:active {
+            opacity: 0.85;
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        #adSection {
+            margin-top: 36px;
+            padding-top: 20px;
+            border-top: 1px solid var(--tg-theme-hint-color, #e5e5ea);
+        }
+
+        #staticAdContainer {
+            min-height: 120px;
+            margin: 16px 0;
+            border-radius: 20px;
+            background: var(--tg-theme-secondary-bg-color, #fafafc);
+            padding: 8px;
+        }
+
+        #fullscreenTrigger {
+            margin-top: 16px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .success-message {
+            background: #34c759;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: #ff3b30;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .info-message {
+            background: #007aff;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .debug-box {
+            background: #1c1c1e;
+            color: #66ff99;
+            padding: 12px;
+            border-radius: 16px;
+            font-family: 'SF Mono', monospace;
+            font-size: 11px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #2c2c2e;
+        }
+
+        .widget-badge {
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-block;
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body>
-
-    <nav>
-        <div class="logo">Abrar jahin<span>.</span></div>
-        <div class="menu-icon">
-        <span></span>
-        <span></span>
-        <span></span>
-        </div>
-        <div class="nav-right">
-             <ul class="nav-links">
-                <li><a href="#Home">Home</a></li>
-                <li><a href="#About">About</a></li>
-                <li><a href="#personal-info">Personal details</a></li>
-                <li><a href="#education">Education</a></li>
-                <li><a href="#service">services</a></li>
-                <li><a href="#contact">contact</a></li>
-            </ul>
-            <div class="theme-switch-wrapper">
-                <label class="theme-switch">
-                    <input type="checkbox" id="theme-toggle">
-                    <span class="slider"></span>
-                </label>
-            
-            </div>
-        </div>
-    </nav>
-
-    <header id="Home"class="hero">
-        <div class="hero-container">
-            <div class="hero-text">
-                <span class="badge">Open for projects</span>
-                <h1>Web designer</h1>
-                <p>I build clean, high-performance web interfaces with a bold aesthetic.</p>
-                <div class="contact-box">
-                    <p><strong>Email:</strong> jahinbang888@gmail.com</p>
-                    <p><strong>Loc:</strong> Hat-laxmipur,Gaibandha-sadar,Gaibandha</p>
-                </div>
-            </div>
-
-            <div class="hero-visual">
-                <div class="image-wrapper">
-                    <img src="img/home.png.png" alt="Abrar jahin">
-                    <div class="stats-card">
-                        <div class="stat">
-                            <span class="num">HTML</span>
-                            <span class="label">Years Exp</span>
-                        </div>
-                        <div class="stat">
-                            <span class="num">CSS</span>
-                            <span class="label">Projects</span>
-                        </div>
-                        <div class="stat">
-                            <span class="num">Javascript</span>
-                            <span class="label">Projects</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-    <section id="About" class="hero">
-    <div class="hero-container">
-        <div class="hero-visual">
-            <div class="glow-effect"></div>
-            <img src="img/home.png.png" alt="Profile" class="profile-img">
-        </div>
-
-        <div class="vertical-divider"></div>
-
-        <div class="hero-text">
-            <h2>Creativity</h2>
-            <h1 class="main-title">Is My Passion</h1>
-            <p class="description">
-                I'm a <span class="highlight">web  designer</span> passionate about experimenting with 
-                new <span class="highlight">skills and creativity</span>. Driven by learning and curiosity, 
-                I'm always looking to explore and learn new development and design skills.
-            </p>
-            <a href="#" class="resume-btn">Resume <i class="icon-file"></i></a>
-        </div>
-    </div>
-</section>
-<section id="personal-info" class="personal-section">
-    <div class="container">
-        <h2 class="section-title">Personal Details</h2>
-        
-        <div class="personal-grid">
-            <div class="info-card">
-                <div class="card-inner">
-                    <div class="card-icon">👨‍👩‍👦</div>
-                    <div class="card-text">
-                        <h3>Family</h3>
-                        <p><strong>Father:</strong> SYED SHAMSUL HUDA</p>
-                        <p><strong>Mother:</strong> KHALEDA AKTER BANU</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-card">
-                <div class="card-inner">
-                    <div class="card-icon">🆔</div>
-                    <div class="card-text">
-                        <h3>Identity</h3>
-                        <p><strong>DOB:</strong> 22 February, 1999</p>
-                        <p><strong>Nationality:</strong> Bangladeshi</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-card">
-                <div class="card-inner">
-                    <div class="card-icon">✨</div>
-                    <div class="card-text">
-                        <h3>General</h3>
-                        <p><strong>Religion:</strong> Islam</p>
-                        <p><strong>Blood Group:</strong> B positive</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-card">
-                <div class="card-inner">
-                    <div class="card-icon">📍</div>
-                    <div class="card-text">
-                        <h3>Address</h3>
-                        <p>Gobindopur, Hat-Laxmipur</p>
-                        <p>Gaibandha Sadar</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<section id="education" class="experience-section">
-    <div class="container">
-        <h2 class="section-title">Education</h2>
-        
-        <div class="experience-grid">
-            <div class="exp-card">
-                <div class="card-content">
-                    <span class="card-icon">🎓</span>
-                    <div class="text-info">
-                        <h3>BSS (Honours)</h3>
-                        <p>Open University, Gaibandha | GPA: 3.69</p>
-                        <span class="badge">2024 (Running)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="exp-card">
-                <div class="card-content">
-                    <span class="card-icon">💻</span>
-                    <div class="text-info">
-                        <h3>Diploma in Computer</h3>
-                        <p>Bogra Polytechnic Institute | GPA: 3.83</p>
-                        <span class="badge">2023</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="exp-card">
-                <div class="card-content">
-                    <span class="card-icon">🏫</span>
-                    <div class="text-info">
-                        <h3>HSC</h3>
-                        <p>Laxmipur High School & College | GPA: 5.00</p>
-                        <span class="badge">2018</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="exp-card">
-                <div class="card-content">
-                    <span class="card-icon">📜</span>
-                    <div class="text-info">
-                        <h3>SSC</h3>
-                        <p>Alatf Ali High School</p>
-                        <span class="badge">2016</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<section id="service"class="services-section">
-    <div class="services-header">
-        <h2>Services</h2>
-        <p>What I offer</p>
+    <h1>🧪 tads Publisher Sandbox</h1>
+    <div class="subtitle">
+        📋 Dashboard widgets: <strong>#9613 (Personal blog)</strong> | <strong>#9643(Personal blog1)</strong> — TGB / Fullscreen ready
     </div>
 
-    <div class="services-container">
-        <div class="service-card">
-            <div class="icon">⊞</div>
-            <h3>UI/UX<br>Designer</h3>
-            <p>Service that provides the best quality and at the request of the client, with professional work and customer support.</p>
-        </div>
+    <div id="debugContainer" class="debug-box hidden"></div>
 
-        <div class="service-card">
-            <div class="icon">&lt;/&gt;</div>
-            <h3>Website<br>Design</h3>
-            <p>Service that provides the best quality and at the request of the client, with professional work and customer support.</p>
-        </div>
-
-        <div class="service-card">
-            <div class="icon">✎</div>
-            <h3>Digital<br>Animator</h3>
-            <p>Service that provides the best quality and at the request of the client, with professional work and customer support.</p>
-        </div>
+    <div class="quick-select">
+        <div class="widget-btn" data-widget="9642" data-name="Personal blog">📰 #9642· Personal blog</div>
+        <div class="widget-btn" data-widget="9643" data-name="Personal blog1">✍️ #9643 · Personal blog1</div>
     </div>
-</section>
-<section id="contact" class="contact-section">
-    <div class="container">
-        <div class="contact-wrapper">
-            
-            <div class="contact-info">
-                <div class="info-item">
-                    <span class="icon">✉</span>
-                    <p>jahinbang888@gmail.com</p>
-                </div>
-                <div class="info-item">
-                    <span class="icon">📱</span>
-                    <p>+01968556066</p>
-                </div>
-                <div class="info-item">
-                    <span class="icon">📍</span>
-                    <p>Hat-laxmpur,Gaibandha-sadar,Gaibandha</p>
-                </div>
-                
-                <div class="social-icons">
-                    <a href="#">🌐</a>
-                    <a href="#">📷</a>
-                    <a href="#">✈</a>
-                </div>
-            </div>
 
-            <div class="contact-form">
-                <form action="#">
-                    <input type="text" placeholder="Names" required>
-                    <input type="email" placeholder="Email" required>
-                    <textarea placeholder="Message" rows="5" required></textarea>
-                    <button type="submit" class="btn-send">Send Message</button>
-                </form>
-            </div>
-
+    <form id="adForm">
+        <div class="form-group">
+            <label for="widgetId">🆔 Widget ID *</label>
+            <input type="text" id="widgetId" name="widgetId" required value="9642" placeholder="9642or 9643">
         </div>
-    </div>
-</section>
 
-    <script src="script.js"></script>
+        <div class="form-group">
+            <label for="adType">📦 Ad Format</label>
+            <select id="adType" name="adType">
+                <option value="static" selected>📄 Text-Graphic Block (TGB)</option>
+                <option value="fullscreen">🖥️ Fullscreen Banner</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="rewardType">🎁 Reward Type</label>
+            <select id="rewardType" name="rewardType">
+                <option value="rewarded">🏆 Rewarded (click/view reward)</option>
+                <option value="non-rewarded">🔹 Non-rewarded</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="name">📛 Name</label>
+            <input type="text" id="name" name="name" value="Personal blog">
+        </div>
+
+        <div class="form-group">
+            <label for="description">📝 Description</label>
+            <textarea id="description" name="description">Blog widget from tads dashboard — #9642 (Personal blog)</textarea>
+        </div>
+
+        <button type="submit" id="submitBtn">🚀 Load Ad</button>
+    </form>
+
+    <div id="adSection" class="hidden">
+        <h2 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            🎯 Ad Preview 
+            <span id="activeWidgetBadge" class="widget-badge">#9642</span>
+        </h2>
+        <div id="staticAdContainer"></div>
+        <button id="fullscreenTrigger" class="hidden">✨ Show Fullscreen Ad</button>
+    </div>
+
+    <div id="messageContainer"></div>
+
+    <script>
+        (function() {
+            // catch unhandled rejections to avoid silent crashes
+            window.addEventListener('unhandledrejection', function(event) {
+                console.error('[TADS] Unhandled promise rejection:', event.reason);
+            });
+
+            // ---------- Debug logger ----------
+            function debugLog(...args) {
+                console.log('[TADS-TEST]', ...args);
+                const debugDiv = document.getElementById('debugContainer');
+                if (debugDiv) {
+                    debugDiv.classList.remove('hidden');
+                    const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+                    const line = args.map(arg => {
+                        try {
+                            if (arg === null) return 'null';
+                            if (arg === undefined) return 'undefined';
+                            if (arg instanceof Error) return `${arg.name}: ${arg.message}`;
+                            if (typeof arg === 'object') return JSON.stringify(arg);
+                            return String(arg);
+                        } catch(e) { return '[unserializable]'; }
+                    }).join(' ');
+                    debugDiv.innerHTML += `[${timestamp}] ${line}\n`;
+                    debugDiv.scrollTop = debugDiv.scrollHeight;
+                }
+            }
+
+            function clearDebug() {
+                const debugDiv = document.getElementById('debugContainer');
+                if (debugDiv) debugDiv.innerHTML = '';
+                debugLog('Debug panel cleared');
+            }
+
+            // Telegram WebApp init
+            const tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.expand();
+                tg.ready();
+                debugLog('Telegram WebApp ready, theme applied');
+            }
+
+            // DOM elements
+            const form = document.getElementById('adForm');
+            const widgetIdInput = document.getElementById('widgetId');
+            const adTypeSelect = document.getElementById('adType');
+            const rewardTypeSelect = document.getElementById('rewardType');
+            const nameInput = document.getElementById('name');
+            const descInput = document.getElementById('description');
+            const submitBtn = document.getElementById('submitBtn');
+            const adSection = document.getElementById('adSection');
+            const staticContainer = document.getElementById('staticAdContainer');
+            const fullscreenBtn = document.getElementById('fullscreenTrigger');
+            const msgContainer = document.getElementById('messageContainer');
+            const activeWidgetBadge = document.getElementById('activeWidgetBadge');
+            const widgetBtns = document.querySelectorAll('.widget-btn');
+
+            // State
+            let currentAdController = null;
+            let currentWidgetId = '9642';
+            let noAdsHandled = false;
+
+            // ---------- UI Helpers ----------
+            function showMessage(type, text) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = type === 'success' ? 'success-message' : (type === 'info' ? 'info-message' : 'error-message');
+                msgDiv.textContent = text;
+                msgContainer.innerHTML = '';
+                msgContainer.appendChild(msgDiv);
+                setTimeout(() => msgDiv.remove(), 4500);
+            }
+
+            function resetAdUI() {
+                debugLog('Resetting ad UI & destroying controller');
+                adSection.classList.add('hidden');
+                staticContainer.innerHTML = '';
+                fullscreenBtn.classList.add('hidden');
+                if (currentAdController && typeof currentAdController.destroy === 'function') {
+                    try { currentAdController.destroy(); } catch(e) { debugLog('destroy error', e); }
+                }
+                currentAdController = null;
+                noAdsHandled = false;
+            }
+
+            function setActiveWidgetUI(widgetId) {
+                widgetBtns.forEach(btn => {
+                    if (btn.dataset.widget === widgetId) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                });
+                if (activeWidgetBadge) activeWidgetBadge.textContent = `#${widgetId}`;
+                currentWidgetId = widgetId;
+                debugLog(`Active widget switched to #${widgetId}`);
+            }
+
+            // ---------- tads readiness check ----------
+            function isTadsReady() {
+                return !!(window.tads && typeof window.tads.init === 'function');
+            }
+
+            function waitForTads(timeout = 8000) {
+                return new Promise((resolve, reject) => {
+                    if (isTadsReady()) return resolve();
+                    debugLog('Waiting for tads.me/widget.js to become available...');
+                    const start = Date.now();
+                    const interval = setInterval(() => {
+                        if (isTadsReady()) {
+                            clearInterval(interval);
+                            debugLog('tads library ready');
+                            resolve();
+                        } else if (Date.now() - start > timeout) {
+                            clearInterval(interval);
+                            reject(new Error('tads script did not load in time'));
+                        }
+                    }, 100);
+                });
+            }
+
+            function normalizeWidgetId(id) {
+                return id.toString().replace(/^#/, '').trim();
+            }
+
+            // ---------- Core ad loader (fixed container convention) ----------
+            async function loadAd(widgetId, adType, rewardType) {
+                clearDebug();
+                debugLog(`loadAd start — widget:${widgetId}, type:${adType}, reward:${rewardType}`);
+                noAdsHandled = false;
+
+                try {
+                    await waitForTads();
+                    const normalizedId = normalizeWidgetId(widgetId);
+                    if (!normalizedId) throw new Error('Empty widget ID');
+
+                    resetAdUI();
+                    setActiveWidgetUI(normalizedId);
+
+                    // IMPORTANT: for static ads, create container with EXACT id format "tads-container-{widgetId}"
+                    if (adType === 'static') {
+                        const requiredContainerId = `tads-container-${normalizedId}`;
+                        debugLog(`Creating static container with ID: ${requiredContainerId}`);
+                        staticContainer.innerHTML = `<div id="${requiredContainerId}" style="min-height:120px; width:100%;"></div>`;
+                        const containerEl = document.getElementById(requiredContainerId);
+                        if (!containerEl) {
+                            throw new Error(`Failed to create container #${requiredContainerId}`);
+                        }
+                        debugLog(`Container verified: ${!!containerEl}`);
+                    }
+
+                    // Define callbacks
+                    const onAdsNotFound = () => {
+                        debugLog(`onAdsNotFound triggered for ${normalizedId}`);
+                        if (!noAdsHandled) {
+                            noAdsHandled = true;
+                            showMessage('info', `ℹ️ No active campaigns for Widget #${normalizedId} right now.`);
+                            adSection.classList.add('hidden');
+                        }
+                    };
+
+                    let onClickReward = null;
+                    let onShowReward = null;
+
+                    if (rewardType === 'rewarded') {
+                        if (adType === 'static') {
+                            onClickReward = (adId, extra) => {
+                                debugLog(`🎁 Click reward received! adId: ${adId}`, extra);
+                                showMessage('success', `🎉 Click reward granted for #${normalizedId}`);
+                            };
+                        } else if (adType === 'fullscreen') {
+                            onShowReward = (result) => {
+                                debugLog(`🎬 Fullscreen view reward:`, result);
+                                showMessage('success', `🏅 Fullscreen reward delivered for #${normalizedId}`);
+                            };
+                        }
+                    }
+
+                    debugLog(`Initializing tads with widgetId=${normalizedId}, type=${adType}`);
+                    const controller = window.tads.init({
+                        widgetId: normalizedId,
+                        type: adType,
+                        debug: false,        // set to false for cleaner production, logs are handled by us
+                        onClickReward: onClickReward,
+                        onShowReward: onShowReward,
+                        onAdsNotFound: onAdsNotFound
+                    });
+
+                    currentAdController = controller;
+                    debugLog(`Controller obtained: ${!!currentAdController}`);
+
+                    if (adType === 'static') {
+                        debugLog('Calling loadAd() on controller...');
+                        await currentAdController.loadAd();
+                        debugLog('loadAd() resolved');
+                        await currentAdController.showAd();
+                        debugLog('showAd() resolved — ad should be displayed');
+                        adSection.classList.remove('hidden');
+                        showMessage('success', `✅ TGB ad loaded for #${normalizedId}`);
+                    } 
+                    else if (adType === 'fullscreen') {
+                        // fullscreen: prepare button and UI
+                        staticContainer.innerHTML = '<div style="padding: 20px; text-align: center; opacity:0.7;">✨ Fullscreen ad ready — tap button below</div>';
+                        fullscreenBtn.classList.remove('hidden');
+                        adSection.classList.remove('hidden');
+
+                        // Replace button to avoid duplicate listeners
+                        const newFullBtn = fullscreenBtn.cloneNode(true);
+                        fullscreenBtn.parentNode.replaceChild(newFullBtn, fullscreenBtn);
+                        const updatedFullBtn = document.getElementById('fullscreenTrigger');
+                        
+                        updatedFullBtn.addEventListener('click', async () => {
+                            if (!currentAdController) {
+                                showMessage('error', 'Controller missing, reload ad first');
+                                return;
+                            }
+                            try {
+                                debugLog('User triggered fullscreen showAd()');
+                                await currentAdController.showAd();
+                                debugLog('Fullscreen ad interaction finished');
+                            } catch (err) {
+                                debugLog('Fullscreen showAd error:', err);
+                                if (!noAdsHandled) {
+                                    noAdsHandled = true;
+                                    showMessage('info', `No fullscreen fill for #${normalizedId}`);
+                                }
+                            }
+                        });
+                        showMessage('success', `📱 Fullscreen ready for #${normalizedId}`);
+                    }
+                } catch (err) {
+                    debugLog('CRITICAL ERROR in loadAd:', err);
+                    const errorMsg = err?.message || String(err);
+                    if (!noAdsHandled && !errorMsg.includes('onAdsNotFound')) {
+                        showMessage('error', `Ad error: ${errorMsg.substring(0, 120)}`);
+                        resetAdUI();
+                    } else if (noAdsHandled) {
+                        debugLog('No ads callback already handled, ignoring error toast');
+                        adSection.classList.add('hidden');
+                    } else {
+                        showMessage('error', `Failed: ${errorMsg}`);
+                        resetAdUI();
+                    }
+                } finally {
+                    debugLog('loadAd finished');
+                }
+            }
+
+            // ---------- Quick select buttons (matching screenshot #9613, #9614) ----------
+            widgetBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const wid = btn.dataset.widget;
+                    const wName = btn.dataset.name;
+                    if (wid) {
+                        widgetIdInput.value = wid;
+                        nameInput.value = wName || '';
+                        if (wid === '9642') descInput.value = 'Blog widget from dashboard #9642 — Personal blog (TGB)';
+                        else if (wid === '9643') descInput.value = 'Blog widget from dashboard #9643— Personal blog1 (TGB)';
+                        setActiveWidgetUI(wid);
+                        showMessage('success', `Selected ${wName} (#${wid})`);
+                        resetAdUI();   // clear previous ad preview
+                    }
+                });
+            });
+
+            // ---------- Form submission ----------
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const widgetRaw = widgetIdInput.value.trim();
+                const adType = adTypeSelect.value;
+                const rewardType = rewardTypeSelect.value;
+
+                if (!widgetRaw) {
+                    showMessage('error', 'Please enter a Widget ID');
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ Loading ad...';
+                await loadAd(widgetRaw, adType, rewardType);
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Load Ad';
+            });
+
+            // initial default
+            setActiveWidgetUI('9642');
+            widgetIdInput.value = '9642';
+            nameInput.value = 'Personal blog';
+            descInput.value = 'Blog widget from dashboard #9642— Personal blog (TGB)';
+
+            // check tads on load
+            window.addEventListener('load', () => {
+                debugLog('Page fully loaded');
+                waitForTads(5000).catch(e => debugLog('tads not ready after load', e.message));
+            });
+        })();
+    </script>
 </body>
 </html>
 
-
-
-    
+                                                
+                    
+                        
+        
+        
+                    
+                        
+        
+                       
+                       
+                        
