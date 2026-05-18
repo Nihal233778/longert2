@@ -144,20 +144,20 @@
 </head>
 <body>
     <h1>🧪 Test Your tads Widget</h1>
-    <div class="subtitle">Widgets from dashboard: #9548 (Abr) | #9549 (ar)</div>
+    <div class="subtitle">Widgets from dashboard: #9673 (Abr) | #9674 (ar)</div>
 
     <!-- Debug info will appear here -->
     <div id="debugContainer" class="debug-box hidden"></div>
 
     <div class="quick-select">
-        <div class="widget-btn" data-widget="9548" data-name="Abr">📋 #9548 (Abr)</div>
-        <div class="widget-btn" data-widget="9549" data-name="ar">📋 #9549 (ar)</div>
+        <div class="widget-btn" data-widget="9673" data-name="Abr">📋 #9673 (Abr)</div>
+        <div class="widget-btn" data-widget="9674 data-name="ar">📋 #9674 (ar)</div>
     </div>
 
     <form id="adForm">
         <div class="form-group">
             <label for="widgetId">Widget ID *</label>
-            <input type="text" id="widgetId" name="widgetId" required value="9548">
+            <input type="text" id="widgetId" name="widgetId" required value="9673">
         </div>
 
         <div class="form-group">
@@ -252,7 +252,7 @@
     const widgetBtns = document.querySelectorAll('.widget-btn');
 
     let currentAdController = null;
-    let currentWidgetId = '9548';
+    let currentWidgetId = '9673';
     let noAdsHandled = false; // flag to prevent double messages
 
     function showMessage(type, text) {
@@ -486,7 +486,7 @@
         submitBtn.textContent = '🚀 Load Ad';
     });
 
-    setActiveWidget('9548');
+    setActiveWidget('9673');
     window.addEventListener('load', () => {
         debugLog('Page loaded');
         checkTads();
