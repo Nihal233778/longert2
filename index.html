@@ -206,20 +206,20 @@
 <body>
     <h1>🧪 tads Publisher Sandbox</h1>
     <div class="subtitle">
-        📋 Dashboard widgets: <strong>#9613 (Personal blog)</strong> | <strong>#9643(Personal blog1)</strong> — TGB / Fullscreen ready
+        📋 Dashboard widgets: <strong>#9904(Personal blog)</strong> | <strong>#9905(Personal blog1)</strong> — TGB / Fullscreen ready
     </div>
 
     <div id="debugContainer" class="debug-box hidden"></div>
 
     <div class="quick-select">
-        <div class="widget-btn" data-widget="9642" data-name="Personal blog">📰 #9642· Personal blog</div>
-        <div class="widget-btn" data-widget="9643" data-name="Personal blog1">✍️ #9643 · Personal blog1</div>
+        <div class="widget-btn" data-widget="9904" data-name="Personal blog">📰 #9904· Personal blog</div>
+        <div class="widget-btn" data-widget="9905" data-name="Personal blog1">✍️ #9905 · Personal blog1</div>
     </div>
 
     <form id="adForm">
         <div class="form-group">
             <label for="widgetId">🆔 Widget ID *</label>
-            <input type="text" id="widgetId" name="widgetId" required value="9642" placeholder="9642or 9643">
+            <input type="text" id="widgetId" name="widgetId" required value="9904" placeholder="9904or 9905">
         </div>
 
         <div class="form-group">
@@ -245,7 +245,7 @@
 
         <div class="form-group">
             <label for="description">📝 Description</label>
-            <textarea id="description" name="description">Blog widget from tads dashboard — #9673 (Personal blog)</textarea>
+            <textarea id="description" name="description">Blog widget from tads dashboard — #9904Personal blog)</textarea>
         </div>
 
         <button type="submit" id="submitBtn">🚀 Load Ad</button>
@@ -254,7 +254,7 @@
     <div id="adSection" class="hidden">
         <h2 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             🎯 Ad Preview 
-            <span id="activeWidgetBadge" class="widget-badge">#9642</span>
+            <span id="activeWidgetBadge" class="widget-badge">#9904</span>
         </h2>
         <div id="staticAdContainer"></div>
         <button id="fullscreenTrigger" class="hidden">✨ Show Fullscreen Ad</button>
@@ -321,7 +321,7 @@
 
             // State
             let currentAdController = null;
-            let currentWidgetId = '9642';
+            let currentWidgetId = '9904';
             let noAdsHandled = false;
 
             // ---------- UI Helpers ----------
@@ -514,8 +514,8 @@
                     if (wid) {
                         widgetIdInput.value = wid;
                         nameInput.value = wName || '';
-                        if (wid === '9642') descInput.value = 'Blog widget from dashboard #9642 — Personal blog (TGB)';
-                        else if (wid === '9643') descInput.value = 'Blog widget from dashboard #9643— Personal blog1 (TGB)';
+                        if (wid === '9904') descInput.value = 'Blog widget from dashboard #9904 - Personal blog (TGB)';
+                        else if (wid === '9905') descInput.value = 'Blog widget from dashboard #9905- Personal blog1 (TGB)';
                         setActiveWidgetUI(wid);
                         showMessage('success', `Selected ${wName} (#${wid})`);
                         resetAdUI();   // clear previous ad preview
@@ -543,8 +543,8 @@
             });
 
             // initial default
-            setActiveWidgetUI('9642');
-            widgetIdInput.value = '9643';
+            setActiveWidgetUI('9904');
+            widgetIdInput.value = '9905';
             nameInput.value = 'Personal blog';
             descInput.value = 'Blog widget from dashboard #9673— Personal blog (TGB)';
 
