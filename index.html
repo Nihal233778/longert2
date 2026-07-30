@@ -1,415 +1,571 @@
+                
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>Telegram Mini App — TADS Ads</title>
-    
-    <!-- Telegram WebApp SDK (required for Mini Apps) -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>tads Publisher TMA · Personal blog widgets</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js?61"></script>
+    <!-- tads widget (must be loaded before usage) -->
+    <script src="https://w.tads.me/widget.js"></script>
     <style>
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 16px;
+            margin: 0;
             background: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
-            padding: 20px 16px 32px 16px;
-            min-height: 100vh;
-            transition: background 0.2s ease, color 0.2s ease;
+            transition: background 0.2s ease;
         }
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* header & card style */
-        .header {
-            margin-bottom: 24px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 1.75rem;
-            font-weight: 600;
+        h1 {
+            font-size: 26px;
             margin-bottom: 6px;
-            color: var(--tg-theme-text-color);
+            font-weight: 620;
+            letter-spacing: -0.3px;
         }
 
-        .header p {
-            font-size: 0.9rem;
-            opacity: 0.75;
+        .subtitle {
+            font-size: 14px;
             color: var(--tg-theme-hint-color, #8e8e93);
+            margin-bottom: 20px;
+            border-left: 3px solid var(--tg-theme-button-color, #40a7e3);
+            padding-left: 12px;
         }
 
-        .info-card {
-            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
-            border-radius: 18px;
-            padding: 16px;
+        .quick-select {
+            display: flex;
+            gap: 12px;
             margin-bottom: 24px;
-            font-size: 0.85rem;
-            border: 0.5px solid var(--tg-theme-section-border-color, rgba(0,0,0,0.08));
+            flex-wrap: wrap;
         }
 
-        .info-card p {
-            margin: 6px 0;
-            line-height: 1.4;
-        }
-
-        .badge {
-            background: var(--tg-theme-button-color, #2c7be5);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            display: inline-block;
-            margin-bottom: 8px;
-        }
-
-        /* ad container styling */
-        .ad-section {
-            background: var(--tg-theme-bg-color, #ffffff);
-            border-radius: 20px;
-            margin: 20px 0 16px 0;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--tg-theme-section-border-color, rgba(0,0,0,0.1));
-        }
-
-        .ad-header {
-            padding: 12px 16px 0 16px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--tg-theme-hint-color, #8e8e93);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        #ad-status-message {
-            font-size: 0.7rem;
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            padding: 4px 10px;
-            border-radius: 30px;
-        }
-
-        .tads-wrapper {
-            padding: 8px 12px 16px 12px;
-            min-height: 180px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #tads-container {
-            width: 100%;
-            transition: all 0.2s;
-        }
-
-        .footer-note {
-            margin-top: 30px;
+        .widget-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 10px;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f2);
+            border: 1.5px solid var(--tg-theme-button-color, #40a7e3);
+            border-radius: 60px;
+            color: var(--tg-theme-text-color, #000000);
+            font-weight: 590;
+            cursor: pointer;
+            transition: all 0.2s ease;
             text-align: center;
-            font-size: 0.7rem;
-            color: var(--tg-theme-hint-color, #8e8e93);
-            border-top: 0.5px solid var(--tg-theme-section-border-color, #e0e0e0);
-            padding-top: 20px;
+            font-size: 14px;
+        }
+
+        .widget-btn:hover, .widget-btn.active {
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border-color: transparent;
+            transform: scale(0.97);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--tg-theme-hint-color, #6c6c70);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--tg-theme-hint-color, #d9d9e3);
+            border-radius: 14px;
+            background: var(--tg-theme-secondary-bg-color, #f9f9fb);
+            color: var(--tg-theme-text-color, #000000);
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--tg-theme-button-color, #40a7e3);
+            box-shadow: 0 0 0 2px rgba(64, 167, 227, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
         }
 
         button {
-            background: var(--tg-theme-button-color, #2c7be5);
-            color: var(--tg-theme-button-text-color, white);
-            border: none;
-            font-weight: 600;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: opacity 0.15s;
             width: 100%;
+            padding: 14px 24px;
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 60px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
             margin-top: 8px;
         }
 
         button:active {
-            opacity: 0.7;
+            opacity: 0.85;
+            transform: scale(0.98);
         }
 
-        .reload-info {
-            margin-top: 12px;
-            font-size: 0.7rem;
+        button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        #adSection {
+            margin-top: 36px;
+            padding-top: 20px;
+            border-top: 1px solid var(--tg-theme-hint-color, #e5e5ea);
+        }
+
+        #staticAdContainer {
+            min-height: 120px;
+            margin: 16px 0;
+            border-radius: 20px;
+            background: var(--tg-theme-secondary-bg-color, #fafafc);
+            padding: 8px;
+        }
+
+        #fullscreenTrigger {
+            margin-top: 16px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .success-message {
+            background: #34c759;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: #ff3b30;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 60px;
+            margin-bottom: 20px;
             text-align: center;
         }
 
-        a {
-            color: var(--tg-theme-link-color, #2c7be5);
-            text-decoration: none;
+        .info-message {
+            background: #007aff;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .debug-box {
+            background: #1c1c1e;
+            color: #66ff99;
+            padding: 12px;
+            border-radius: 16px;
+            font-family: 'SF Mono', monospace;
+            font-size: 11px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #2c2c2e;
+        }
+
+        .widget-badge {
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-block;
+            margin-left: 10px;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>✨ TADS Mini App</h1>
-        <p>Smart ads · Rewarded experience</p>
+    <h1>🧪 tads Publisher Sandbox</h1>
+    <div class="subtitle">
+        📋 Dashboard widgets: <strong>#9904(Personal blog)</strong> | <strong>#9905(Personal blog1)</strong> — TGB / Fullscreen ready
     </div>
 
-    <div class="info-card">
-        <span class="badge">📱 Telegram Mini App</span>
-        <p><strong>⚡ Async ad widget</strong> — optimized page speed with <code>async</code> script loading.<br>
-        🎁 <strong>Reward callbacks:</strong> view or click on ads → you'll receive a reward notification.<br>
-        🔧 <strong>Widget ID required:</strong> Replace <code>YOUR_WIDGET_ID</code> below with your actual TADS widget ID.</p>
-        <p style="font-family: monospace; background: var(--tg-theme-bg-color, #eee); padding: 6px; border-radius: 10px; margin-top: 8px;">
-            ⚙️ Current Widget ID: <span id="widget-id-display" style="font-weight:bold;">YOUR_WIDGET_ID</span>
-        </p>
+    <div id="debugContainer" class="debug-box hidden"></div>
+
+    <div class="quick-select">
+        <div class="widget-btn" data-widget="9904" data-name="Personal blog">📰 #9904· Personal blog</div>
+        <div class="widget-btn" data-widget="9905" data-name="Personal blog1">✍️ #9905 · Personal blog1</div>
     </div>
 
-    <!-- Ad unit section (Text-Graphic Block) -->
-    <div class="ad-section">
-        <div class="ad-header">
-            <span>📢 SPONSORED CONTENT</span>
-            <span id="ad-status-message">⏳ loading ad...</span>
+    <form id="adForm">
+        <div class="form-group">
+            <label for="widgetId">🆔 Widget ID *</label>
+            <input type="text" id="widgetId" name="widgetId" required value="9904" placeholder="9904or 9905">
         </div>
-        <div class="tads-wrapper">
-            <!-- TADS container div: ID must match pattern tads-container-{WIDGET_ID} -->
-            <div id="tads-container"></div>
+
+        <div class="form-group">
+            <label for="adType">📦 Ad Format</label>
+            <select id="adType" name="adType">
+                <option value="static" selected>📄 Text-Graphic Block (TGB)</option>
+                <option value="fullscreen">🖥️ Fullscreen Banner</option>
+            </select>
         </div>
+
+        <div class="form-group">
+            <label for="rewardType">🎁 Reward Type</label>
+            <select id="rewardType" name="rewardType">
+                <option value="rewarded">🏆 Rewarded (click/view reward)</option>
+                <option value="non-rewarded">🔹 Non-rewarded</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="name">📛 Name</label>
+            <input type="text" id="name" name="name" value="Personal blog">
+        </div>
+
+        <div class="form-group">
+            <label for="description">📝 Description</label>
+            <textarea id="description" name="description">Blog widget from tads dashboard — #9673 (Personal blog)</textarea>
+        </div>
+
+        <button type="submit" id="submitBtn">🚀 Load Ad</button>
+    </form>
+
+    <div id="adSection" class="hidden">
+        <h2 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            🎯 Ad Preview 
+            <span id="activeWidgetBadge" class="widget-badge">#9904</span>
+        </h2>
+        <div id="staticAdContainer"></div>
+        <button id="fullscreenTrigger" class="hidden">✨ Show Fullscreen Ad</button>
     </div>
 
-    <div class="footer-note">
-        <p>✅ Ad loads automatically via <strong>Text-Graphic Block (TGB)</strong> format.<br>
-        🎯 Rewards are triggered when ad is viewed or clicked (demo popups).</p>
-        <div class="reload-info">
-            💡 <em>No ads?</em> Check widget ID or TADS dashboard. Fallback message will appear.
-        </div>
-    </div>
-</div>
+    <div id="messageContainer"></div>
 
-<script>
-    (function() {
-        // ============================================================
-        // 1. CONFIGURATION – REPLACE WITH YOUR ACTUAL WIDGET ID
-        // ============================================================
-        // 📌 IMPORTANT: Replace 'YOUR_WIDGET_ID' with the ID from your TADS account.
-        // Example: const WIDGET_ID = "wid_abc123xyz";
-        const WIDGET_ID = "9905";   // <--- CHANGE THIS TO YOUR REAL WIDGET ID
-        
-        // Display widget ID in UI for clarity
-        const widgetSpan = document.getElementById('widget-id-display');
-        if (widgetSpan) widgetSpan.innerText = WIDGET_ID;
-        
-        // Use debug: false in production, true for testing (no impressions count)
-        const IS_DEBUG_MODE = false;   // set to true only during development
-        
-        // ============================================================
-        // 2. TELEGRAM MINI APP INITIALIZATION
-        // ============================================================
-        const tg = window.Telegram.WebApp;
-        tg.ready();                // Tell Telegram that the app is ready
-        tg.expand();              // Expand to full height (removes default bottom bar gap)
-        
-        // Optional: apply theme-based styling to body (already using CSS variables)
-        // change status bar color
-        tg.setHeaderColor('bg_color');
-        
-        // ============================================================
-        // 3. HELPER FUNCTIONS & REWARD CALLBACKS (Telegram friendly)
-        // ============================================================
-        // Toast / Popup utility using Telegram WebApp native popup
-        function showRewardPopup(title, message, rewardType = 'view') {
-            tg.showPopup({
-                title: title || (rewardType === 'click' ? '🎉 Click Reward!' : '🎁 Ad Reward'),
-                message: message || `You earned a reward for ${rewardType === 'click' ? 'clicking the ad' : 'watching the ad'}!`,
-                buttons: [{ type: 'ok', text: 'Awesome!' }]
+    <script>
+        (function() {
+            // catch unhandled rejections to avoid silent crashes
+            window.addEventListener('unhandledrejection', function(event) {
+                console.error('[TADS] Unhandled promise rejection:', event.reason);
             });
-            // Optional haptic feedback (feels more native)
-            tg.HapticFeedback.impactOccurred('light');
-        }
-        
-        // Update status message in UI
-        const statusSpan = document.getElementById('ad-status-message');
-        function updateStatusMessage(text, isError = false) {
-            if (statusSpan) {
-                statusSpan.innerText = text;
-                statusSpan.style.color = isError ? 'var(--tg-theme-destructive-text-color, #ff3b30)' : '';
-                if (!isError) statusSpan.style.color = '';
-            }
-            console.log(`[TADS Status] ${text}`);
-        }
-        
-        // Called when no ads are found (or error)
-        const adsNotFoundCallback = () => {
-            updateStatusMessage('⚠️ No ads available', true);
-            tg.showPopup({
-                title: 'No ad to display',
-                message: 'No sponsored content at the moment. Try again later.',
-                buttons: [{ type: 'close' }]
-            });
-        };
-        
-        // onShowReward: when the ad is fully shown / impression counted
-        const onShowRewardHandler = (adId) => {
-            console.log(`[Reward] Ad shown, ID: ${adId}`);
-            updateStatusMessage('✅ Ad displayed ✓');
-            showRewardPopup('✨ Ad Viewed', `You just watched an ad (ID: ${adId}). +1 reward granted!`, 'view');
-            // Here you can implement your actual reward logic (e.g., grant in-game coins, lives, etc.)
-        };
-        
-        // onClickReward: when user clicks on the ad unit
-        const onClickRewardHandler = (adId) => {
-            console.log(`[Reward] Ad clicked, ID: ${adId}`);
-            updateStatusMessage('🖱️ Ad clicked! Bonus!');
-            showRewardPopup('🔥 Click Reward', `You clicked the ad! Extra reward unlocked. Ad ID: ${adId}`, 'click');
-            // Implement additional reward for click if needed (e.g., double coins)
-        };
-        
-        // ============================================================
-        // 4. TADS WIDGET INITIALIZATION (Async loading + robust waiting)
-        //    Based on the official "async" advanced snippet for TGB (Text-Graphic Block)
-        // ============================================================
-        // Build the container element's ID as required by TADS: tads-container-YOUR_WIDGET_ID
-        const containerDiv = document.getElementById('tads-container');
-        if (containerDiv) {
-            containerDiv.id = `tads-container-${WIDGET_ID}`;
-        } else {
-            console.error('Missing #tads-container wrapper');
-        }
-        
-        // This function initializes the controller and shows the ad
-        function initAdController() {
-            // Ensure tads library is available
-            if (!window.tads || typeof window.tads.init !== 'function') {
-                console.warn('TADS not ready yet, will retry');
-                return false;
-            }
-            
-            try {
-                // Create ad controller (Static = Text-Graphic Block)
-                const adController = window.tads.init({
-                    widgetId: WIDGET_ID,
-                    type: 'static',          // TGB uses static type
-                    debug: IS_DEBUG_MODE,
-                    onShowReward: onShowRewardHandler,
-                    onClickReward: onClickRewardHandler,
-                    onAdsNotFound: adsNotFoundCallback
-                });
-                
-                // Load the ad first, then show inside the container
-                adController.loadAd()
-                    .then(() => {
-                        updateStatusMessage('🎬 Showing ad...');
-                        return adController.showAd();
-                    })
-                    .then(() => {
-                        updateStatusMessage('📢 Active');
-                        console.log('TADS ad displayed successfully');
-                    })
-                    .catch((err) => {
-                        console.error('TADS error:', err);
-                        updateStatusMessage('❌ Failed to load ad', true);
-                        adsNotFoundCallback();
-                    });
-                return true;
-            } catch (err) {
-                console.error('Init exception:', err);
-                updateStatusMessage('Init error', true);
-                adsNotFoundCallback();
-                return false;
-            }
-        }
-        
-        // Robust widget initializer: waits for window.tads to be ready
-        // This replicates the advanced async-ready pattern from docs
-        const initTadsWidget = function() {
-            // If tads already available, directly start
-            if (window.tads && window.tads.init) {
-                initAdController();
-                return;
-            }
-            
-            // Otherwise poll every 100ms until script loads (max 5 seconds)
-            let attempts = 0;
-            const maxAttempts = 50; // 5 seconds (50 * 100ms)
-            const tadsInterval = setInterval(() => {
-                attempts++;
-                if (window.tads && window.tads.init) {
-                    clearInterval(tadsInterval);
-                    initAdController();
-                } else if (attempts >= maxAttempts) {
-                    clearInterval(tadsInterval);
-                    console.error('TADS script did not load in time');
-                    updateStatusMessage('⏱️ Load timeout', true);
-                    tg.showPopup({
-                        title: 'Ad service unavailable',
-                        message: 'Could not load ad widget. Please check your internet or try later.',
-                        buttons: [{ type: 'close' }]
-                    });
+
+            // ---------- Debug logger ----------
+            function debugLog(...args) {
+                console.log('[TADS-TEST]', ...args);
+                const debugDiv = document.getElementById('debugContainer');
+                if (debugDiv) {
+                    debugDiv.classList.remove('hidden');
+                    const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+                    const line = args.map(arg => {
+                        try {
+                            if (arg === null) return 'null';
+                            if (arg === undefined) return 'undefined';
+                            if (arg instanceof Error) return `${arg.name}: ${arg.message}`;
+                            if (typeof arg === 'object') return JSON.stringify(arg);
+                            return String(arg);
+                        } catch(e) { return '[unserializable]'; }
+                    }).join(' ');
+                    debugDiv.innerHTML += `[${timestamp}] ${line}\n`;
+                    debugDiv.scrollTop = debugDiv.scrollHeight;
                 }
-            }, 100);
-        };
-        
-        // Ensure DOM is fully loaded before trying to init widget (container exists)
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initTadsWidget);
-        } else {
-            initTadsWidget();
-        }
-        
-        // ============================================================
-        // 5. OPTIONAL: Add manual reload / test button (informative only)
-        //    Since the widget loads once, we just provide a console tip
-        // ============================================================
-        // For advanced use — we create a hidden but useful instruction;
-        // The ad will be automatically loaded with correct container ID.
-        console.log(`Telegram Mini App + TADS | Widget ID: ${WIDGET_ID} | Debug: ${IS_DEBUG_MODE}`);
-        
-        // Optional: handle theme changes (Telegram sends theme update)
-        tg.onEvent('themeChanged', () => {
-            // CSS variables already applied by Telegram WebApp runtime automatically.
-            console.log('Theme updated, TADS container remains');
-        });
-        
-        // handle closing/closing event gracefully
-        tg.onEvent('viewportChanged', () => {
-            // ensure ad container gets proper sizing if needed (no extra)
-        });
-        
-        // In case WIDGET_ID is default placeholder, display warning but do not break.
-        if (WIDGET_ID === '9905') {
-            const warnDiv = document.createElement('div');
-            warnDiv.style.backgroundColor = 'rgba(255, 100, 100, 0.2)';
-            warnDiv.style.padding = '12px';
-            warnDiv.style.borderRadius = '16px';
-            warnDiv.style.marginTop = '20px';
-            warnDiv.style.fontSize = '0.8rem';
-            warnDiv.style.border = '1px solid var(--tg-theme-destructive-text-color, #ff5e5e)';
-            warnDiv.innerHTML = '⚠️ <strong>Widget ID not configured</strong><br>Please replace <code>YOUR_WIDGET_ID</code> inside the script with your actual TADS widget ID. Until then, ads won’t load.';
-            document.querySelector('.container').appendChild(warnDiv);
-            updateStatusMessage('❗ Invalid Widget ID', true);
-        }
-    })();
-</script>
+            }
 
-<!-- TADS Async Script: loads widget core in non-blocking way -->
-<script src="https://w.tads.me/widget.js" async></script>
+            function clearDebug() {
+                const debugDiv = document.getElementById('debugContainer');
+                if (debugDiv) debugDiv.innerHTML = '';
+                debugLog('Debug panel cleared');
+            }
 
-<!-- 
-    ================================================================
-    INTEGRATION NOTES (for developers):
-    - This mini app uses the async widget method to speed up loading.
-    - Widget container ID is dynamically built as "tads-container-YOUR_WIDGET_ID"
-    - TGB (Text-Graphic Block) automatically displays ad after load&show.
-    - Reward callbacks trigger native Telegram popups + haptics.
-    - All styling adapts to Telegram theme (light/dark mode).
-    - Debug mode is OFF in production. Set IS_DEBUG_MODE = true for testing (no stats).
-    ================================================================
--->
+            // Telegram WebApp init
+            const tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.expand();
+                tg.ready();
+                debugLog('Telegram WebApp ready, theme applied');
+            }
+
+            // DOM elements
+            const form = document.getElementById('adForm');
+            const widgetIdInput = document.getElementById('widgetId');
+            const adTypeSelect = document.getElementById('adType');
+            const rewardTypeSelect = document.getElementById('rewardType');
+            const nameInput = document.getElementById('name');
+            const descInput = document.getElementById('description');
+            const submitBtn = document.getElementById('submitBtn');
+            const adSection = document.getElementById('adSection');
+            const staticContainer = document.getElementById('staticAdContainer');
+            const fullscreenBtn = document.getElementById('fullscreenTrigger');
+            const msgContainer = document.getElementById('messageContainer');
+            const activeWidgetBadge = document.getElementById('activeWidgetBadge');
+            const widgetBtns = document.querySelectorAll('.widget-btn');
+
+            // State
+            let currentAdController = null;
+            let currentWidgetId = '9904';
+            let noAdsHandled = true;
+
+            // ---------- UI Helpers ----------
+            function showMessage(type, text) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = type === 'success' ? 'success-message' : (type === 'info' ? 'info-message' : 'error-message');
+                msgDiv.textContent = text;
+                msgContainer.innerHTML = '';
+                msgContainer.appendChild(msgDiv);
+                setTimeout(() => msgDiv.remove(), 4500);
+            }
+
+            function resetAdUI() {
+                debugLog('Resetting ad UI & destroying controller');
+                adSection.classList.add('hidden');
+                staticContainer.innerHTML = '';
+                fullscreenBtn.classList.add('hidden');
+                if (currentAdController && typeof currentAdController.destroy === 'function') {
+                    try { currentAdController.destroy(); } catch(e) { debugLog('destroy error', e); }
+                }
+                currentAdController = null;
+                noAdsHandled = false;
+            }
+
+            function setActiveWidgetUI(widgetId) {
+                widgetBtns.forEach(btn => {
+                    if (btn.dataset.widget === widgetId) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                });
+                if (activeWidgetBadge) activeWidgetBadge.textContent = `#${widgetId}`;
+                currentWidgetId = widgetId;
+                debugLog(`Active widget switched to #${widgetId}`);
+            }
+
+            // ---------- tads readiness check ----------
+            function isTadsReady() {
+                return !!(window.tads && typeof window.tads.init === 'function');
+            }
+
+            function waitForTads(timeout = 8000) {
+                return new Promise((resolve, reject) => {
+                    if (isTadsReady()) return resolve();
+                    debugLog('Waiting for tads.me/widget.js to become available...');
+                    const start = Date.now();
+                    const interval = setInterval(() => {
+                        if (isTadsReady()) {
+                            clearInterval(interval);
+                            debugLog('tads library ready');
+                            resolve();
+                        } else if (Date.now() - start > timeout) {
+                            clearInterval(interval);
+                            reject(new Error('tads script did not load in time'));
+                        }
+                    }, 100);
+                });
+            }
+
+            function normalizeWidgetId(id) {
+                return id.toString().replace(/^#/, '').trim();
+            }
+
+            // ---------- Core ad loader (fixed container convention) ----------
+            async function loadAd(widgetId, adType, rewardType) {
+                clearDebug();
+                debugLog(`loadAd start — widget:${widgetId}, type:${adType}, reward:${rewardType}`);
+                noAdsHandled = false;
+
+                try {
+                    await waitForTads();
+                    const normalizedId = normalizeWidgetId(widgetId);
+                    if (!normalizedId) throw new Error('Empty widget ID');
+
+                    resetAdUI();
+                    setActiveWidgetUI(normalizedId);
+
+                    // IMPORTANT: for static ads, create container with EXACT id format "tads-container-{widgetId}"
+                    if (adType === 'static') {
+                        const requiredContainerId = `tads-container-${normalizedId}`;
+                        debugLog(`Creating static container with ID: ${requiredContainerId}`);
+                        staticContainer.innerHTML = `<div id="${requiredContainerId}" style="min-height:120px; width:100%;"></div>`;
+                        const containerEl = document.getElementById(requiredContainerId);
+                        if (!containerEl) {
+                            throw new Error(`Failed to create container #${requiredContainerId}`);
+                        }
+                        debugLog(`Container verified: ${!!containerEl}`);
+                    }
+
+                    // Define callbacks
+                    const onAdsNotFound = () => {
+                        debugLog(`onAdsNotFound triggered for ${normalizedId}`);
+                        if (!noAdsHandled) {
+                            noAdsHandled = true;
+                            showMessage('info', `ℹ️ No active campaigns for Widget #${normalizedId} right now.`);
+                            adSection.classList.add('hidden');
+                        }
+                    };
+
+                    let onClickReward = null;
+                    let onShowReward = null;
+
+                    if (rewardType === 'rewarded') {
+                        if (adType === 'static') {
+                            onClickReward = (adId, extra) => {
+                                debugLog(`🎁 Click reward received! adId: ${adId}`, extra);
+                                showMessage('success', `🎉 Click reward granted for #${normalizedId}`);
+                            };
+                        } else if (adType === 'fullscreen') {
+                            onShowReward = (result) => {
+                                debugLog(`🎬 Fullscreen view reward:`, result);
+                                showMessage('success', `🏅 Fullscreen reward delivered for #${normalizedId}`);
+                            };
+                        }
+                    }
+
+                    debugLog(`Initializing tads with widgetId=${normalizedId}, type=${adType}`);
+                    const controller = window.tads.init({
+                        widgetId: normalizedId,
+                        type: adType,
+                        debug: false,        // set to false for cleaner production, logs are handled by us
+                        onClickReward: onClickReward,
+                        onShowReward: onShowReward,
+                        onAdsNotFound: onAdsNotFound
+                    });
+
+                    currentAdController = controller;
+                    debugLog(`Controller obtained: ${!!currentAdController}`);
+
+                    if (adType === 'static') {
+                        debugLog('Calling loadAd() on controller...');
+                        await currentAdController.loadAd();
+                        debugLog('loadAd() resolved');
+                        await currentAdController.showAd();
+                        debugLog('showAd() resolved — ad should be displayed');
+                        adSection.classList.remove('hidden');
+                        showMessage('success', `✅ TGB ad loaded for #${normalizedId}`);
+                    } 
+                    else if (adType === 'fullscreen') {
+                        // fullscreen: prepare button and UI
+                        staticContainer.innerHTML = '<div style="padding: 20px; text-align: center; opacity:0.7;">✨ Fullscreen ad ready — tap button below</div>';
+                        fullscreenBtn.classList.remove('hidden');
+                        adSection.classList.remove('hidden');
+
+                        // Replace button to avoid duplicate listeners
+                        const newFullBtn = fullscreenBtn.cloneNode(true);
+                        fullscreenBtn.parentNode.replaceChild(newFullBtn, fullscreenBtn);
+                        const updatedFullBtn = document.getElementById('fullscreenTrigger');
+                        
+                        updatedFullBtn.addEventListener('click', async () => {
+                            if (!currentAdController) {
+                                showMessage('error', 'Controller missing, reload ad first');
+                                return;
+                            }
+                            try {
+                                debugLog('User triggered fullscreen showAd()');
+                                await currentAdController.showAd();
+                                debugLog('Fullscreen ad interaction finished');
+                            } catch (err) {
+                                debugLog('Fullscreen showAd error:', err);
+                                if (!noAdsHandled) {
+                                    noAdsHandled = true;
+                                    showMessage('info', `No fullscreen fill for #${normalizedId}`);
+                                }
+                            }
+                        });
+                        showMessage('success', `📱 Fullscreen ready for #${normalizedId}`);
+                    }
+                } catch (err) {
+                    debugLog('CRITICAL ERROR in loadAd:', err);
+                    const errorMsg = err?.message || String(err);
+                    if (!noAdsHandled && !errorMsg.includes('onAdsNotFound')) {
+                        showMessage('error', `Ad error: ${errorMsg.substring(0, 120)}`);
+                        resetAdUI();
+                    } else if (noAdsHandled) {
+                        debugLog('No ads callback already handled, ignoring error toast');
+                        adSection.classList.add('hidden');
+                    } else {
+                        showMessage('error', `Failed: ${errorMsg}`);
+                        resetAdUI();
+                    }
+                } finally {
+                    debugLog('loadAd finished');
+                }
+            }
+
+            // ---------- Quick select buttons (matching screenshot #9613, #9614) ----------
+            widgetBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const wid = btn.dataset.widget;
+                    const wName = btn.dataset.name;
+                    if (wid) {
+                        widgetIdInput.value = wid;
+                        nameInput.value = wName || '';
+                        if (wid === '9642') descInput.value = 'Blog widget from dashboard #9642 — Personal blog (TGB)';
+                        else if (wid === '9643') descInput.value = 'Blog widget from dashboard #9643— Personal blog1 (TGB)';
+                        setActiveWidgetUI(wid);
+                        showMessage('success', `Selected ${wName} (#${wid})`);
+                        resetAdUI();   // clear previous ad preview
+                    }
+                });
+            });
+
+            // ---------- Form submission ----------
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const widgetRaw = widgetIdInput.value.trim();
+                const adType = adTypeSelect.value;
+                const rewardType = rewardTypeSelect.value;
+
+                if (!widgetRaw) {
+                    showMessage('error', 'Please enter a Widget ID');
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ Loading ad...';
+                await loadAd(widgetRaw, adType, rewardType);
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Load Ad';
+            });
+
+            // initial default
+            setActiveWidgetUI('9904');
+            widgetIdInput.value = '9905';
+            nameInput.value = 'Personal blog';
+            descInput.value = 'Blog widget from dashboard #9673— Personal blog (TGB)';
+
+            // check tads on load
+            window.addEventListener('load', () => {
+                debugLog('Page fully loaded');
+                waitForTads(5000).catch(e => debugLog('tads not ready after load', e.message));
+            });
+        })();
+    </script>
 </body>
 </html>
+
+                                                
+                    
+                        
+        
+        
+                    
+                        
+        
+                       
+                       
+                        
