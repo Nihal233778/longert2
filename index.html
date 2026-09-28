@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Tap to Earn · TMA</title>
+    
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js?61"></script>
     
-    
+    <!-- ✅ Taddy Bot SDK Integration (Placed exactly as instructed) -->
     <script src="https://sdk.taddy.pro/web/taddy.min.js" data-pub-id="bae4efc5d7fd683e066c127ec7684bda"></script>
+    
     <!-- TADS widget (optional, for when ads become available) -->
     <script src="https://w.tads.me/widget.js"></script>
+    
     <style>
         * {
             box-sizing: border-box;
@@ -417,8 +420,8 @@
                 fullscreenCooldownUntil: 0,
                 adRewardAmount: 50,
                 fullscreenRewardAmount: 100,
-                fallbackAdReward: 25,          // Fallback when no ad available
-                fallbackFullscreenReward: 50,   // Fallback when no fullscreen ad available
+                fallbackAdReward: 25,          
+                fallbackFullscreenReward: 50,   
             };
 
             // ---------- Debug Logger ----------
@@ -560,19 +563,14 @@
             tapButton.addEventListener('contextmenu', (e) => e.preventDefault());
 
             // ================================================================
-            //  REWARD FUNCTIONS — RECREATED WITH FALLBACK LOGIC
+            //  REWARD FUNCTIONS
             // ================================================================
-
-            /**
-             * Grant the ad reward.
-             * @param {boolean} adWasShown - true if a real ad was displayed, false for fallback.
-             */
             function grantAdReward(adWasShown = false) {
                 const reward = adWasShown ? state.adRewardAmount : state.fallbackAdReward;
                 state.balance += reward;
                 state.energy = Math.min(state.maxEnergy, state.energy + reward);
                 state.lastRegenTimestamp = Date.now();
-                state.adCooldownUntil = Date.now() + 30000; // 30s cooldown
+                state.adCooldownUntil = Date.now() + 30000; 
                 updateUI();
 
                 const message = adWasShown
@@ -586,16 +584,12 @@
                 debugLog(`Ad reward granted: ${reward} (adWasShown=${adWasShown})`);
             }
 
-            /**
-             * Grant the fullscreen reward.
-             * @param {boolean} adWasShown - true if a real fullscreen ad was displayed, false for fallback.
-             */
             function grantFullscreenReward(adWasShown = false) {
                 const reward = adWasShown ? state.fullscreenRewardAmount : state.fallbackFullscreenReward;
                 state.balance += reward;
                 state.energy = Math.min(state.maxEnergy, state.energy + reward);
                 state.lastRegenTimestamp = Date.now();
-                state.fullscreenCooldownUntil = Date.now() + 60000; // 60s cooldown
+                state.fullscreenCooldownUntil = Date.now() + 60000; 
                 updateUI();
 
                 const message = adWasShown
@@ -610,13 +604,8 @@
             }
 
             // ================================================================
-            //  AD HANDLERS — WITH GRACEFUL FALLBACK
+            //  AD HANDLERS
             // ================================================================
-
-            /**
-             * Handle the "Watch Ad" button click.
-             * Attempts to load a real TADS ad; if none is available, grants a fallback reward.
-             */
             async function handleRewardAd() {
                 const now = Date.now();
                 if (now < state.adCooldownUntil) {
@@ -627,13 +616,11 @@
                 showToast('📺 Loading reward ad...');
                 debugLog('Attempting to load reward ad...');
 
-                // Check if TADS is available and ready
                 if (window.tads && typeof window.tads.init === 'function') {
                     try {
                         const widgetId = '9904';
                         const containerId = `tads-reward-container-${widgetId}-${Date.now()}`;
 
-                        // Create a hidden container for the ad
                         const tempContainer = document.createElement('div');
                         tempContainer.id = containerId;
                         tempContainer.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
@@ -641,7 +628,6 @@
 
                         let rewardGranted = false;
 
-                        // Timeout safety: if ad doesn't resolve in 5s, grant fallback
                         const safetyTimeout = setTimeout(() => {
                             if (!rewardGranted) {
                                 rewardGranted = true;
@@ -661,7 +647,7 @@
                                     rewardGranted = true;
                                     clearTimeout(safetyTimeout);
                                     tempContainer.remove();
-                                    grantAdReward(false); // fallback
+                                    grantAdReward(false); 
                                 }
                             },
                             onClickReward: (adId, extra) => {
@@ -670,7 +656,7 @@
                                     rewardGranted = true;
                                     clearTimeout(safetyTimeout);
                                     tempContainer.remove();
-                                    grantAdReward(true); // real ad
+                                    grantAdReward(true); 
                                 }
                             }
                         });
@@ -678,7 +664,6 @@
                         await controller.loadAd();
                         await controller.showAd();
 
-                        // If the ad loaded and showed but no callback fired, give reward
                         if (!rewardGranted) {
                             rewardGranted = true;
                             clearTimeout(safetyTimeout);
@@ -688,7 +673,6 @@
                             }, 1500);
                         }
 
-                        // Cleanup controller after a while
                         setTimeout(() => {
                             try { controller.destroy(); } catch(e) {}
                             tempContainer.remove();
@@ -696,20 +680,14 @@
 
                     } catch (err) {
                         debugLog('Reward ad error:', err);
-                        // Fallback on error
                         grantAdReward(false);
                     }
                 } else {
-                    // TADS not available at all — fallback
                     debugLog('TADS not available — granting fallback reward');
                     grantAdReward(false);
                 }
             }
 
-            /**
-             * Handle the "Fullscreen" button click.
-             * Attempts to load a real TADS fullscreen ad; if none is available, grants a fallback reward.
-             */
             async function handleFullscreenAd() {
                 const now = Date.now();
                 if (now < state.fullscreenCooldownUntil) {
@@ -724,7 +702,6 @@
                     try {
                         let rewardGranted = false;
 
-                        // Safety timeout — grant fallback if no reward in 6s
                         const safetyTimeout = setTimeout(() => {
                             if (!rewardGranted) {
                                 rewardGranted = true;
@@ -742,7 +719,7 @@
                                 if (!rewardGranted) {
                                     rewardGranted = true;
                                     clearTimeout(safetyTimeout);
-                                    grantFullscreenReward(false); // fallback
+                                    grantFullscreenReward(false); 
                                 }
                             },
                             onShowReward: (result) => {
@@ -750,14 +727,13 @@
                                 if (!rewardGranted) {
                                     rewardGranted = true;
                                     clearTimeout(safetyTimeout);
-                                    grantFullscreenReward(true); // real ad
+                                    grantFullscreenReward(true); 
                                 }
                             }
                         });
 
                         await controller.showAd();
 
-                        // If showAd resolved but no callback fired, grant reward
                         if (!rewardGranted) {
                             rewardGranted = true;
                             clearTimeout(safetyTimeout);
@@ -776,7 +752,6 @@
                 }
             }
 
-            // Attach handlers
             rewardAdBtn.addEventListener('click', handleRewardAd);
             fullscreenAdBtn.addEventListener('click', handleFullscreenAd);
 
