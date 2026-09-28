@@ -6,6 +6,8 @@
     <title>Tap to Earn · TMA</title>
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js?61"></script>
+    <!-- TADS widget (optional, for when ads become available) -->
+    <script src="https://w.tads.me/widget.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -82,7 +84,7 @@
         }
 
         .balance-value.bump {
-            transform: scale(1.05);
+            transform: scale(1.08);
         }
 
         .tap-area {
@@ -117,13 +119,6 @@
         .tap-button:active {
             transform: scale(0.92);
             box-shadow: 0 0 50px rgba(245, 215, 66, 0.4), inset 0 0 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .tap-button.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-            filter: grayscale(0.6);
-            animation: none;
         }
 
         @keyframes pulse-glow {
@@ -323,29 +318,6 @@
             display: block;
         }
 
-        .cooldown-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: 800;
-            color: #f5d742;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-        }
-
-        .cooldown-overlay.active {
-            opacity: 1;
-        }
-
         .floating-number {
             position: absolute;
             font-size: 22px;
@@ -360,10 +332,6 @@
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
             100% { opacity: 0; transform: translateY(-60px) scale(1.4); }
-        }
-
-        .balance-value.bump {
-            transform: scale(1.08);
         }
     </style>
 </head>
@@ -383,7 +351,6 @@
         <div class="tap-area">
             <div class="tap-button" id="tapButton">
                 💎
-                <div class="cooldown-overlay" id="cooldownOverlay"></div>
             </div>
 
             <div class="energy-container">
@@ -412,14 +379,13 @@
             <div class="reward-title">🎁 Earn Rewards</div>
             <div class="reward-buttons">
                 <button class="btn btn-gold" id="rewardAdBtn">📺 Watch Ad · +50 ⚡</button>
-                <button class="btn btn-secondary" id="fullscreenAdBtn">✨ Fullscreen</button>
+                <button class="btn btn-secondary" id="fullscreenAdBtn">✨ Fullscreen · +100 ⚡</button>
             </div>
         </div>
     </div>
 
     <div class="message-toast hidden" id="messageToast"></div>
 
-    <!-- Telegram WebApp SDK already loaded -->
     <script>
         (function() {
             'use strict';
@@ -448,6 +414,8 @@
                 fullscreenCooldownUntil: 0,
                 adRewardAmount: 50,
                 fullscreenRewardAmount: 100,
+                fallbackAdReward: 25,          // Fallback when no ad available
+                fallbackFullscreenReward: 50,   // Fallback when no fullscreen ad available
             };
 
             // ---------- Debug Logger ----------
@@ -488,7 +456,6 @@
             const messageToast = document.getElementById('messageToast');
             const rewardAdBtn = document.getElementById('rewardAdBtn');
             const fullscreenAdBtn = document.getElementById('fullscreenAdBtn');
-            const cooldownOverlay = document.getElementById('cooldownOverlay');
 
             // ---------- Message Helper ----------
             let toastTimer = null;
@@ -527,7 +494,6 @@
                 const pct = (state.energy / state.maxEnergy) * 100;
                 energyBar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
 
-                // Update button states based on cooldowns
                 const now = Date.now();
                 rewardAdBtn.disabled = now < state.adCooldownUntil;
                 fullscreenAdBtn.disabled = now < state.fullscreenCooldownUntil;
@@ -552,52 +518,102 @@
                 e.preventDefault();
                 const now = Date.now();
 
-                // Cooldown check
                 if (now - state.lastTapTime < state.tapCooldownMs) {
                     return;
                 }
                 state.lastTapTime = now;
 
-                // Energy check
                 if (state.energy < 1) {
                     showToast('⚡ Not enough energy! Watch an ad or wait.');
                     return;
                 }
 
-                // Consume energy
                 state.energy = Math.max(0, state.energy - 1);
-                state.lastRegenTimestamp = now; // reset regen timer
+                state.lastRegenTimestamp = now;
 
-                // Award points
                 state.balance += state.perTap;
                 state.totalTaps += 1;
 
-                // Visual feedback
                 spawnFloatingNumber(state.perTap);
                 balanceDisplay.classList.add('bump');
                 setTimeout(() => balanceDisplay.classList.remove('bump'), 150);
 
-                // Telegram haptic feedback
                 if (tg?.HapticFeedback) {
                     tg.HapticFeedback.impactOccurred('light');
                 }
 
                 updateUI();
 
-                // Check for level up / milestones
                 if (state.totalTaps % 50 === 0) {
                     showToast(`🎉 ${state.totalTaps} taps! You're on fire!`);
                 }
             }
 
             tapButton.addEventListener('click', handleTap);
-            // Also handle touchstart for faster response
             tapButton.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 handleTap(e);
             }, { passive: false });
+            tapButton.addEventListener('contextmenu', (e) => e.preventDefault());
 
-            // ---------- Reward: Watch Ad (Static TGB) ----------
+            // ================================================================
+            //  REWARD FUNCTIONS — RECREATED WITH FALLBACK LOGIC
+            // ================================================================
+
+            /**
+             * Grant the ad reward.
+             * @param {boolean} adWasShown - true if a real ad was displayed, false for fallback.
+             */
+            function grantAdReward(adWasShown = false) {
+                const reward = adWasShown ? state.adRewardAmount : state.fallbackAdReward;
+                state.balance += reward;
+                state.energy = Math.min(state.maxEnergy, state.energy + reward);
+                state.lastRegenTimestamp = Date.now();
+                state.adCooldownUntil = Date.now() + 30000; // 30s cooldown
+                updateUI();
+
+                const message = adWasShown
+                    ? `🎉 +${reward} points & energy from ad!`
+                    : `🎁 +${reward} bonus points (no ad available)`;
+                showToast(message, 3000);
+
+                if (tg?.HapticFeedback) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                }
+                debugLog(`Ad reward granted: ${reward} (adWasShown=${adWasShown})`);
+            }
+
+            /**
+             * Grant the fullscreen reward.
+             * @param {boolean} adWasShown - true if a real fullscreen ad was displayed, false for fallback.
+             */
+            function grantFullscreenReward(adWasShown = false) {
+                const reward = adWasShown ? state.fullscreenRewardAmount : state.fallbackFullscreenReward;
+                state.balance += reward;
+                state.energy = Math.min(state.maxEnergy, state.energy + reward);
+                state.lastRegenTimestamp = Date.now();
+                state.fullscreenCooldownUntil = Date.now() + 60000; // 60s cooldown
+                updateUI();
+
+                const message = adWasShown
+                    ? `🏅 +${reward} points from fullscreen ad!`
+                    : `🎁 +${reward} bonus points (no fullscreen available)`;
+                showToast(message, 3000);
+
+                if (tg?.HapticFeedback) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                }
+                debugLog(`Fullscreen reward granted: ${reward} (adWasShown=${adWasShown})`);
+            }
+
+            // ================================================================
+            //  AD HANDLERS — WITH GRACEFUL FALLBACK
+            // ================================================================
+
+            /**
+             * Handle the "Watch Ad" button click.
+             * Attempts to load a real TADS ad; if none is available, grants a fallback reward.
+             */
             async function handleRewardAd() {
                 const now = Date.now();
                 if (now < state.adCooldownUntil) {
@@ -605,85 +621,92 @@
                     return;
                 }
 
-                // Simulate ad view (in real TMA you'd integrate tads)
                 showToast('📺 Loading reward ad...');
+                debugLog('Attempting to load reward ad...');
 
-                // Simulate ad network delay
-                await new Promise(resolve => setTimeout(resolve, 1200));
-
-                // Check if we have tads available
+                // Check if TADS is available and ready
                 if (window.tads && typeof window.tads.init === 'function') {
                     try {
-                        // Use a sample widget ID for reward ads
                         const widgetId = '9904';
-                        const containerId = `tads-reward-container-${widgetId}`;
+                        const containerId = `tads-reward-container-${widgetId}-${Date.now()}`;
 
-                        // Create a temporary container
+                        // Create a hidden container for the ad
                         const tempContainer = document.createElement('div');
                         tempContainer.id = containerId;
                         tempContainer.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
                         document.body.appendChild(tempContainer);
+
+                        let rewardGranted = false;
+
+                        // Timeout safety: if ad doesn't resolve in 5s, grant fallback
+                        const safetyTimeout = setTimeout(() => {
+                            if (!rewardGranted) {
+                                rewardGranted = true;
+                                debugLog('Ad load timeout — granting fallback reward');
+                                tempContainer.remove();
+                                grantAdReward(false);
+                            }
+                        }, 5000);
 
                         const controller = window.tads.init({
                             widgetId: widgetId,
                             type: 'static',
                             debug: false,
                             onAdsNotFound: () => {
-                                debugLog('No reward ads available');
-                                tempContainer.remove();
-                                // Fallback: give reward anyway for demo
-                                grantAdReward();
+                                debugLog('onAdsNotFound — no reward ads available');
+                                if (!rewardGranted) {
+                                    rewardGranted = true;
+                                    clearTimeout(safetyTimeout);
+                                    tempContainer.remove();
+                                    grantAdReward(false); // fallback
+                                }
                             },
                             onClickReward: (adId, extra) => {
                                 debugLog('Reward ad clicked', adId, extra);
-                                tempContainer.remove();
-                                grantAdReward();
+                                if (!rewardGranted) {
+                                    rewardGranted = true;
+                                    clearTimeout(safetyTimeout);
+                                    tempContainer.remove();
+                                    grantAdReward(true); // real ad
+                                }
                             }
                         });
 
                         await controller.loadAd();
                         await controller.showAd();
 
-                        // Cleanup after a delay
+                        // If the ad loaded and showed but no callback fired, give reward
+                        if (!rewardGranted) {
+                            rewardGranted = true;
+                            clearTimeout(safetyTimeout);
+                            setTimeout(() => {
+                                tempContainer.remove();
+                                grantAdReward(true);
+                            }, 1500);
+                        }
+
+                        // Cleanup controller after a while
                         setTimeout(() => {
                             try { controller.destroy(); } catch(e) {}
                             tempContainer.remove();
-                        }, 3000);
-
-                        // Also grant reward after showing
-                        setTimeout(() => {
-                            grantAdReward();
-                        }, 1500);
+                        }, 6000);
 
                     } catch (err) {
                         debugLog('Reward ad error:', err);
-                        tempContainer?.remove();
-                        // Fallback: give reward anyway for demo
-                        grantAdReward();
+                        // Fallback on error
+                        grantAdReward(false);
                     }
                 } else {
-                    // No tads available — give reward directly (demo mode)
-                    debugLog('tads not available, granting demo reward');
-                    grantAdReward();
+                    // TADS not available at all — fallback
+                    debugLog('TADS not available — granting fallback reward');
+                    grantAdReward(false);
                 }
             }
 
-            function grantAdReward() {
-                const reward = state.adRewardAmount;
-                state.balance += reward;
-                state.energy = Math.min(state.maxEnergy, state.energy + reward);
-                state.lastRegenTimestamp = Date.now();
-                state.adCooldownUntil = Date.now() + 30000; // 30s cooldown
-                updateUI();
-                showToast(`🎉 +${reward} points & energy!`, 3000);
-                if (tg?.HapticFeedback) {
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-            }
-
-            rewardAdBtn.addEventListener('click', handleRewardAd);
-
-            // ---------- Fullscreen Ad ----------
+            /**
+             * Handle the "Fullscreen" button click.
+             * Attempts to load a real TADS fullscreen ad; if none is available, grants a fallback reward.
+             */
             async function handleFullscreenAd() {
                 const now = Date.now();
                 if (now < state.fullscreenCooldownUntil) {
@@ -692,48 +715,66 @@
                 }
 
                 showToast('🖥️ Preparing fullscreen ad...');
+                debugLog('Attempting to load fullscreen ad...');
 
                 if (window.tads && typeof window.tads.init === 'function') {
                     try {
+                        let rewardGranted = false;
+
+                        // Safety timeout — grant fallback if no reward in 6s
+                        const safetyTimeout = setTimeout(() => {
+                            if (!rewardGranted) {
+                                rewardGranted = true;
+                                debugLog('Fullscreen timeout — granting fallback reward');
+                                grantFullscreenReward(false);
+                            }
+                        }, 6000);
+
                         const controller = window.tads.init({
                             widgetId: '9905',
                             type: 'fullscreen',
                             debug: false,
                             onAdsNotFound: () => {
-                                debugLog('No fullscreen ads available');
-                                grantFullscreenReward();
+                                debugLog('onAdsNotFound — no fullscreen ads available');
+                                if (!rewardGranted) {
+                                    rewardGranted = true;
+                                    clearTimeout(safetyTimeout);
+                                    grantFullscreenReward(false); // fallback
+                                }
                             },
                             onShowReward: (result) => {
                                 debugLog('Fullscreen reward:', result);
-                                grantFullscreenReward();
+                                if (!rewardGranted) {
+                                    rewardGranted = true;
+                                    clearTimeout(safetyTimeout);
+                                    grantFullscreenReward(true); // real ad
+                                }
                             }
                         });
 
                         await controller.showAd();
+
+                        // If showAd resolved but no callback fired, grant reward
+                        if (!rewardGranted) {
+                            rewardGranted = true;
+                            clearTimeout(safetyTimeout);
+                            setTimeout(() => {
+                                grantFullscreenReward(true);
+                            }, 1000);
+                        }
+
                     } catch (err) {
                         debugLog('Fullscreen error:', err);
-                        grantFullscreenReward();
+                        grantFullscreenReward(false);
                     }
                 } else {
-                    // Demo fallback
-                    debugLog('tads not available, granting demo fullscreen reward');
-                    grantFullscreenReward();
+                    debugLog('TADS not available — granting fallback fullscreen reward');
+                    grantFullscreenReward(false);
                 }
             }
 
-            function grantFullscreenReward() {
-                const reward = state.fullscreenRewardAmount;
-                state.balance += reward;
-                state.energy = Math.min(state.maxEnergy, state.energy + reward);
-                state.lastRegenTimestamp = Date.now();
-                state.fullscreenCooldownUntil = Date.now() + 60000; // 60s cooldown
-                updateUI();
-                showToast(`🏅 +${reward} points from fullscreen!`, 3000);
-                if (tg?.HapticFeedback) {
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-            }
-
+            // Attach handlers
+            rewardAdBtn.addEventListener('click', handleRewardAd);
             fullscreenAdBtn.addEventListener('click', handleFullscreenAd);
 
             // ---------- Energy regen loop ----------
@@ -744,14 +785,10 @@
 
             // ---------- Initial UI ----------
             updateUI();
-            debugLog('Tap to Earn TMA initialized');
+            debugLog('Tap to Earn TMA initialized with fallback rewards');
 
-            // ---------- Prevent context menu on long press ----------
-            tapButton.addEventListener('contextmenu', (e) => e.preventDefault());
-
-            // ---------- Auto-save to Telegram Cloud Storage (optional) ----------
+            // ---------- Cloud Storage (optional) ----------
             if (tg?.CloudStorage) {
-                // Try to load saved state
                 tg.CloudStorage.getItem('tapEarnState', (err, value) => {
                     if (!err && value) {
                         try {
@@ -766,7 +803,6 @@
                 });
             }
 
-            // Periodically save
             setInterval(() => {
                 if (tg?.CloudStorage) {
                     tg.CloudStorage.setItem('tapEarnState', JSON.stringify({
@@ -780,4 +816,4 @@
         })();
     </script>
 </body>
-</html>                
+</html>
