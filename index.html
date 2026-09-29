@@ -2,796 +2,414 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Tap to Earn · TMA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Telegram Mini App — TADS Ads</title>
     
-    <!-- Telegram WebApp SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js?61"></script>
-    
-    <!-- ✅ Taddy Bot SDK Integration (Placed exactly as instructed) -->
-    <script src="https://sdk.taddy.pro/web/taddy.min.js" data-pub-id="bae4efc5d7fd683e066c127ec7684bda"></script>
-    
-    <!-- TADS widget (optional, for when ads become available) -->
-    <script src="https://w.tads.me/widget.js"></script>
+    <!-- Telegram WebApp SDK (required for Mini Apps) -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <style>
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 20px 16px 32px 16px;
             min-height: 100vh;
-            background: var(--tg-theme-bg-color, #1a1a2e);
-            color: var(--tg-theme-text-color, #ffffff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s ease;
-            padding: 12px;
+            transition: background 0.2s ease, color 0.2s ease;
         }
 
-        .app-container {
-            width: 100%;
-            max-width: 400px;
-            background: var(--tg-theme-secondary-bg-color, #16213e);
-            border-radius: 36px;
-            padding: 24px 20px 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* header & card style */
+        .header {
+            margin-bottom: 24px;
             text-align: center;
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        h1 {
-            font-size: 26px;
-            font-weight: 700;
-            margin: 0 0 6px;
-            letter-spacing: -0.3px;
-            background: linear-gradient(135deg, #f5d742, #f7b733);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            font-size: 13px;
-            color: var(--tg-theme-hint-color, #8e8e93);
-            margin-bottom: 18px;
-        }
-
-        .balance-card {
-            background: var(--tg-theme-bg-color, #0f0f1f);
-            border-radius: 24px;
-            padding: 18px 16px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .balance-label {
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--tg-theme-hint-color, #8e8e93);
-            margin-bottom: 4px;
-        }
-
-        .balance-value {
-            font-size: 38px;
-            font-weight: 800;
-            line-height: 1.1;
-            color: #f5d742;
-            text-shadow: 0 0 20px rgba(245, 215, 66, 0.25);
-            transition: transform 0.1s ease;
-        }
-
-        .balance-value.bump {
-            transform: scale(1.08);
-        }
-
-        .tap-area {
-            position: relative;
-            margin: 8px auto 16px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .tap-button {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #3a3a6a, #1e1e3f);
-            border: 3px solid rgba(245, 215, 66, 0.4);
-            box-shadow: 0 0 30px rgba(245, 215, 66, 0.15), inset 0 0 30px rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 64px;
-            cursor: pointer;
-            transition: transform 0.08s ease, box-shadow 0.2s ease;
-            margin-bottom: 14px;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-            animation: pulse-glow 2.5s infinite ease-in-out;
-            position: relative;
-        }
-
-        .tap-button:active {
-            transform: scale(0.92);
-            box-shadow: 0 0 50px rgba(245, 215, 66, 0.4), inset 0 0 30px rgba(0, 0, 0, 0.5);
-        }
-
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 30px rgba(245, 215, 66, 0.1), inset 0 0 30px rgba(0, 0, 0, 0.5); }
-            50% { box-shadow: 0 0 50px rgba(245, 215, 66, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.5); }
-            100% { box-shadow: 0 0 30px rgba(245, 215, 66, 0.1), inset 0 0 30px rgba(0, 0, 0, 0.5); }
-        }
-
-        .energy-container {
-            width: 100%;
-            max-width: 280px;
-            margin: 0 auto 6px;
-        }
-
-        .energy-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: var(--tg-theme-hint-color, #8e8e93);
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
             margin-bottom: 6px;
-            padding: 0 4px;
+            color: var(--tg-theme-text-color);
         }
 
-        .energy-bar-bg {
-            width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.08);
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.75;
+            color: var(--tg-theme-hint-color, #8e8e93);
+        }
+
+        .info-card {
+            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+            border: 0.5px solid var(--tg-theme-section-border-color, rgba(0,0,0,0.08));
+        }
+
+        .info-card p {
+            margin: 6px 0;
+            line-height: 1.4;
+        }
+
+        .badge {
+            background: var(--tg-theme-button-color, #2c7be5);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            padding: 4px 12px;
             border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        /* ad container styling */
+        .ad-section {
+            background: var(--tg-theme-bg-color, #ffffff);
+            border-radius: 20px;
+            margin: 20px 0 16px 0;
             overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--tg-theme-section-border-color, rgba(0,0,0,0.1));
         }
 
-        .energy-bar-fill {
-            height: 100%;
-            width: 100%;
-            background: linear-gradient(90deg, #f5d742, #f7b733);
-            border-radius: 20px;
-            transition: width 0.2s ease;
-            box-shadow: 0 0 12px rgba(245, 215, 66, 0.4);
-        }
-
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin: 14px 0 18px;
-        }
-
-        .stat-item {
-            flex: 1;
-            background: var(--tg-theme-bg-color, #0f0f1f);
-            border-radius: 16px;
-            padding: 10px 6px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .stat-label {
-            font-size: 10px;
+        .ad-header {
+            padding: 12px 16px 0 16px;
+            font-size: 0.75rem;
+            font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: var(--tg-theme-hint-color, #8e8e93);
-        }
-
-        .stat-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: #f5d742;
-            margin-top: 2px;
-        }
-
-        .reward-section {
-            margin-top: 12px;
-            padding: 14px 12px;
-            background: rgba(245, 215, 66, 0.06);
-            border-radius: 20px;
-            border: 1px dashed rgba(245, 215, 66, 0.3);
-        }
-
-        .reward-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #f5d742;
-            margin-bottom: 10px;
-        }
-
-        .reward-buttons {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .btn {
-            flex: 1;
-            padding: 12px 10px;
-            border-radius: 40px;
+        #ad-status-message {
+            font-size: 0.7rem;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            padding: 4px 10px;
+            border-radius: 30px;
+        }
+
+        .tads-wrapper {
+            padding: 8px 12px 16px 12px;
+            min-height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #tads-container {
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--tg-theme-hint-color, #8e8e93);
+            border-top: 0.5px solid var(--tg-theme-section-border-color, #e0e0e0);
+            padding-top: 20px;
+        }
+
+        button {
+            background: var(--tg-theme-button-color, #2c7be5);
+            color: var(--tg-theme-button-text-color, white);
             border: none;
             font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: inherit;
-            background: var(--tg-theme-button-color, #40a7e3);
-            color: var(--tg-theme-button-text-color, #ffffff);
-        }
-
-        .btn:active {
-            transform: scale(0.96);
-            opacity: 0.85;
-        }
-
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--tg-theme-text-color, #ffffff);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-gold {
-            background: linear-gradient(135deg, #f5d742, #f7b733);
-            color: #1a1a2e;
-            font-weight: 700;
-        }
-
-        .message-toast {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(30, 30, 50, 0.95);
-            color: #fff;
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 40px;
-            font-size: 14px;
-            font-weight: 500;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(245, 215, 66, 0.3);
-            z-index: 999;
-            backdrop-filter: blur(10px);
-            max-width: 90%;
-            text-align: center;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .message-toast.hidden {
-            opacity: 0;
-            transform: translateX(-50%) translateY(20px);
-            pointer-events: none;
-        }
-
-        .debug-toggle {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            font-size: 11px;
-            color: var(--tg-theme-hint-color, #8e8e93);
+            font-size: 0.9rem;
             cursor: pointer;
-            opacity: 0.5;
-            background: none;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 8px;
+            transition: opacity 0.15s;
+            width: 100%;
+            margin-top: 8px;
         }
 
-        .debug-toggle:hover {
-            opacity: 1;
+        button:active {
+            opacity: 0.7;
         }
 
-        .debug-panel {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 380px;
-            background: #0d0d1a;
-            color: #66ff99;
-            padding: 10px 14px;
-            border-radius: 16px;
-            font-family: 'SF Mono', monospace;
-            font-size: 10px;
-            white-space: pre-wrap;
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid #2c2c2e;
-            z-index: 1000;
-            display: none;
+        .reload-info {
+            margin-top: 12px;
+            font-size: 0.7rem;
+            text-align: center;
         }
 
-        .debug-panel.visible {
-            display: block;
-        }
-
-        .floating-number {
-            position: absolute;
-            font-size: 22px;
-            font-weight: 800;
-            color: #f5d742;
-            pointer-events: none;
-            animation: floatUp 0.8s ease-out forwards;
-            text-shadow: 0 0 10px rgba(245, 215, 66, 0.5);
-            z-index: 10;
-        }
-
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-60px) scale(1.4); }
+        a {
+            color: var(--tg-theme-link-color, #2c7be5);
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <button class="debug-toggle" id="debugToggle">⚙️</button>
-        <div class="debug-panel" id="debugPanel"></div>
+<div class="container">
+    <div class="header">
+        <h1>✨ TADS Mini App</h1>
+        <p>Smart ads · Rewarded experience</p>
+    </div>
 
-        <h1>💎 Tap to Earn</h1>
-        <div class="subtitle">Tap the crystal, earn points & unlock rewards</div>
+    <div class="info-card">
+        <span class="badge">📱 Telegram Mini App</span>
+        <p><strong>⚡ Async ad widget</strong> — optimized page speed with <code>async</code> script loading.<br>
+        🎁 <strong>Reward callbacks:</strong> view or click on ads → you'll receive a reward notification.<br>
+        🔧 <strong>Widget ID required:</strong> Replace <code>YOUR_WIDGET_ID</code> below with your actual TADS widget ID.</p>
+        <p style="font-family: monospace; background: var(--tg-theme-bg-color, #eee); padding: 6px; border-radius: 10px; margin-top: 8px;">
+            ⚙️ Current Widget ID: <span id="widget-id-display" style="font-weight:bold;">YOUR_WIDGET_ID</span>
+        </p>
+    </div>
 
-        <div class="balance-card">
-            <div class="balance-label">YOUR BALANCE</div>
-            <div class="balance-value" id="balanceDisplay">0</div>
+    <!-- Ad unit section (Text-Graphic Block) -->
+    <div class="ad-section">
+        <div class="ad-header">
+            <span>📢 SPONSORED CONTENT</span>
+            <span id="ad-status-message">⏳ loading ad...</span>
         </div>
-
-        <div class="tap-area">
-            <div class="tap-button" id="tapButton">
-                💎
-            </div>
-
-            <div class="energy-container">
-                <div class="energy-label">
-                    <span>⚡ Energy</span>
-                    <span id="energyText">100 / 100</span>
-                </div>
-                <div class="energy-bar-bg">
-                    <div class="energy-bar-fill" id="energyBar" style="width: 100%"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="stats-row">
-            <div class="stat-item">
-                <div class="stat-label">Total Taps</div>
-                <div class="stat-value" id="totalTaps">0</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Per Tap</div>
-                <div class="stat-value" id="perTap">+1</div>
-            </div>
-        </div>
-
-        <div class="reward-section">
-            <div class="reward-title">🎁 Earn Rewards</div>
-            <div class="reward-buttons">
-                <button class="btn btn-gold" id="rewardAdBtn">📺 Watch Ad · +50 ⚡</button>
-                <button class="btn btn-secondary" id="fullscreenAdBtn">✨ Fullscreen · +100 ⚡</button>
-            </div>
+        <div class="tads-wrapper">
+            <!-- TADS container div: ID must match pattern tads-container-{WIDGET_ID} -->
+            <div id="tads-container"></div>
         </div>
     </div>
 
-    <div class="message-toast hidden" id="messageToast"></div>
+    <div class="footer-note">
+        <p>✅ Ad loads automatically via <strong>Text-Graphic Block (TGB)</strong> format.<br>
+        🎯 Rewards are triggered when ad is viewed or clicked (demo popups).</p>
+        <div class="reload-info">
+            💡 <em>No ads?</em> Check widget ID or TADS dashboard. Fallback message will appear.
+        </div>
+    </div>
+</div>
 
-    <script>
-        (function() {
-            'use strict';
-
-            // ---------- Telegram WebApp init ----------
-            const tg = window.Telegram?.WebApp;
-            if (tg) {
-                tg.expand();
-                tg.ready();
-                tg.setHeaderColor?.('#1a1a2e');
-                tg.setBackgroundColor?.('#1a1a2e');
-            }
-
-            // ---------- State ----------
-            const state = {
-                balance: 0,
-                totalTaps: 0,
-                energy: 100,
-                maxEnergy: 100,
-                perTap: 1,
-                energyRegenPerSecond: 1.5,
-                lastRegenTimestamp: Date.now(),
-                lastTapTime: 0,
-                tapCooldownMs: 80,
-                adCooldownUntil: 0,
-                fullscreenCooldownUntil: 0,
-                adRewardAmount: 50,
-                fullscreenRewardAmount: 100,
-                fallbackAdReward: 25,          
-                fallbackFullscreenReward: 50,   
-            };
-
-            // ---------- Debug Logger ----------
-            const debugPanel = document.getElementById('debugPanel');
-            const debugToggle = document.getElementById('debugToggle');
-            let debugVisible = false;
-
-            debugToggle.addEventListener('click', () => {
-                debugVisible = !debugVisible;
-                debugPanel.classList.toggle('visible', debugVisible);
+<script>
+    (function() {
+        // ============================================================
+        // 1. CONFIGURATION – REPLACE WITH YOUR ACTUAL WIDGET ID
+        // ============================================================
+        // 📌 IMPORTANT: Replace 'YOUR_WIDGET_ID' with the ID from your TADS account.
+        // Example: const WIDGET_ID = "wid_abc123xyz";
+        const WIDGET_ID = "9643";   // <--- CHANGE THIS TO YOUR REAL WIDGET ID
+        
+        // Display widget ID in UI for clarity
+        const widgetSpan = document.getElementById('widget-id-display');
+        if (widgetSpan) widgetSpan.innerText = WIDGET_ID;
+        
+        // Use debug: false in production, true for testing (no impressions count)
+        const IS_DEBUG_MODE = false;   // set to true only during development
+        
+        // ============================================================
+        // 2. TELEGRAM MINI APP INITIALIZATION
+        // ============================================================
+        const tg = window.Telegram.WebApp;
+        tg.ready();                // Tell Telegram that the app is ready
+        tg.expand();              // Expand to full height (removes default bottom bar gap)
+        
+        // Optional: apply theme-based styling to body (already using CSS variables)
+        // change status bar color
+        tg.setHeaderColor('bg_color');
+        
+        // ============================================================
+        // 3. HELPER FUNCTIONS & REWARD CALLBACKS (Telegram friendly)
+        // ============================================================
+        // Toast / Popup utility using Telegram WebApp native popup
+        function showRewardPopup(title, message, rewardType = 'view') {
+            tg.showPopup({
+                title: title || (rewardType === 'click' ? '🎉 Click Reward!' : '🎁 Ad Reward'),
+                message: message || `You earned a reward for ${rewardType === 'click' ? 'clicking the ad' : 'watching the ad'}!`,
+                buttons: [{ type: 'ok', text: 'Awesome!' }]
             });
-
-            function debugLog(...args) {
-                const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
-                const line = args.map(arg => {
-                    try {
-                        if (arg === null) return 'null';
-                        if (arg === undefined) return 'undefined';
-                        if (arg instanceof Error) return `${arg.name}: ${arg.message}`;
-                        if (typeof arg === 'object') return JSON.stringify(arg);
-                        return String(arg);
-                    } catch(e) { return '[unserializable]'; }
-                }).join(' ');
-                if (debugPanel) {
-                    debugPanel.innerHTML += `[${timestamp}] ${line}\n`;
-                    debugPanel.scrollTop = debugPanel.scrollHeight;
-                }
-                console.log('[TAP-TO-EARN]', ...args);
+            // Optional haptic feedback (feels more native)
+            tg.HapticFeedback.impactOccurred('light');
+        }
+        
+        // Update status message in UI
+        const statusSpan = document.getElementById('ad-status-message');
+        function updateStatusMessage(text, isError = false) {
+            if (statusSpan) {
+                statusSpan.innerText = text;
+                statusSpan.style.color = isError ? 'var(--tg-theme-destructive-text-color, #ff3b30)' : '';
+                if (!isError) statusSpan.style.color = '';
             }
-
-            // ---------- DOM refs ----------
-            const balanceDisplay = document.getElementById('balanceDisplay');
-            const totalTapsEl = document.getElementById('totalTaps');
-            const perTapEl = document.getElementById('perTap');
-            const energyText = document.getElementById('energyText');
-            const energyBar = document.getElementById('energyBar');
-            const tapButton = document.getElementById('tapButton');
-            const messageToast = document.getElementById('messageToast');
-            const rewardAdBtn = document.getElementById('rewardAdBtn');
-            const fullscreenAdBtn = document.getElementById('fullscreenAdBtn');
-
-            // ---------- Message Helper ----------
-            let toastTimer = null;
-            function showToast(text, duration = 2500) {
-                messageToast.textContent = text;
-                messageToast.classList.remove('hidden');
-                if (toastTimer) clearTimeout(toastTimer);
-                toastTimer = setTimeout(() => {
-                    messageToast.classList.add('hidden');
-                }, duration);
+            console.log(`[TADS Status] ${text}`);
+        }
+        
+        // Called when no ads are found (or error)
+        const adsNotFoundCallback = () => {
+            updateStatusMessage('⚠️ No ads available', true);
+            tg.showPopup({
+                title: 'No ad to display',
+                message: 'No sponsored content at the moment. Try again later.',
+                buttons: [{ type: 'close' }]
+            });
+        };
+        
+        // onShowReward: when the ad is fully shown / impression counted
+        const onShowRewardHandler = (adId) => {
+            console.log(`[Reward] Ad shown, ID: ${adId}`);
+            updateStatusMessage('✅ Ad displayed ✓');
+            showRewardPopup('✨ Ad Viewed', `You just watched an ad (ID: ${adId}). +1 reward granted!`, 'view');
+            // Here you can implement your actual reward logic (e.g., grant in-game coins, lives, etc.)
+        };
+        
+        // onClickReward: when user clicks on the ad unit
+        const onClickRewardHandler = (adId) => {
+            console.log(`[Reward] Ad clicked, ID: ${adId}`);
+            updateStatusMessage('🖱️ Ad clicked! Bonus!');
+            showRewardPopup('🔥 Click Reward', `You clicked the ad! Extra reward unlocked. Ad ID: ${adId}`, 'click');
+            // Implement additional reward for click if needed (e.g., double coins)
+        };
+        
+        // ============================================================
+        // 4. TADS WIDGET INITIALIZATION (Async loading + robust waiting)
+        //    Based on the official "async" advanced snippet for TGB (Text-Graphic Block)
+        // ============================================================
+        // Build the container element's ID as required by TADS: tads-container-YOUR_WIDGET_ID
+        const containerDiv = document.getElementById('tads-container');
+        if (containerDiv) {
+            containerDiv.id = `tads-container-${WIDGET_ID}`;
+        } else {
+            console.error('Missing #tads-container wrapper');
+        }
+        
+        // This function initializes the controller and shows the ad
+        function initAdController() {
+            // Ensure tads library is available
+            if (!window.tads || typeof window.tads.init !== 'function') {
+                console.warn('TADS not ready yet, will retry');
+                return false;
             }
-
-            // ---------- Energy Regeneration ----------
-            function regenerateEnergy() {
-                const now = Date.now();
-                const elapsedSeconds = (now - state.lastRegenTimestamp) / 1000;
-                if (elapsedSeconds > 0.5) {
-                    const regenAmount = Math.floor(elapsedSeconds * state.energyRegenPerSecond);
-                    if (regenAmount > 0) {
-                        const oldEnergy = state.energy;
-                        state.energy = Math.min(state.maxEnergy, state.energy + regenAmount);
-                        state.lastRegenTimestamp = now;
-                        if (oldEnergy !== state.energy) {
-                            updateUI();
-                        }
-                    }
-                }
-            }
-
-            // ---------- UI Update ----------
-            function updateUI() {
-                balanceDisplay.textContent = state.balance.toLocaleString();
-                totalTapsEl.textContent = state.totalTaps.toLocaleString();
-                perTapEl.textContent = `+${state.perTap}`;
-                energyText.textContent = `${Math.floor(state.energy)} / ${state.maxEnergy}`;
-                const pct = (state.energy / state.maxEnergy) * 100;
-                energyBar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
-
-                const now = Date.now();
-                rewardAdBtn.disabled = now < state.adCooldownUntil;
-                fullscreenAdBtn.disabled = now < state.fullscreenCooldownUntil;
-            }
-
-            // ---------- Floating number animation ----------
-            function spawnFloatingNumber(amount) {
-                const el = document.createElement('div');
-                el.className = 'floating-number';
-                el.textContent = `+${amount}`;
-                const rect = tapButton.getBoundingClientRect();
-                const containerRect = tapButton.parentElement.getBoundingClientRect();
-                el.style.left = `${rect.left - containerRect.left + rect.width / 2 - 20}px`;
-                el.style.top = `${rect.top - containerRect.top + 20}px`;
-                tapButton.parentElement.style.position = 'relative';
-                tapButton.parentElement.appendChild(el);
-                setTimeout(() => el.remove(), 800);
-            }
-
-            // ---------- Tap Handler ----------
-            function handleTap(e) {
-                e.preventDefault();
-                const now = Date.now();
-
-                if (now - state.lastTapTime < state.tapCooldownMs) {
-                    return;
-                }
-                state.lastTapTime = now;
-
-                if (state.energy < 1) {
-                    showToast('⚡ Not enough energy! Watch an ad or wait.');
-                    return;
-                }
-
-                state.energy = Math.max(0, state.energy - 1);
-                state.lastRegenTimestamp = now;
-
-                state.balance += state.perTap;
-                state.totalTaps += 1;
-
-                spawnFloatingNumber(state.perTap);
-                balanceDisplay.classList.add('bump');
-                setTimeout(() => balanceDisplay.classList.remove('bump'), 150);
-
-                if (tg?.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('light');
-                }
-
-                updateUI();
-
-                if (state.totalTaps % 50 === 0) {
-                    showToast(`🎉 ${state.totalTaps} taps! You're on fire!`);
-                }
-            }
-
-            tapButton.addEventListener('click', handleTap);
-            tapButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleTap(e);
-            }, { passive: false });
-            tapButton.addEventListener('contextmenu', (e) => e.preventDefault());
-
-            // ================================================================
-            //  REWARD FUNCTIONS
-            // ================================================================
-            function grantAdReward(adWasShown = false) {
-                const reward = adWasShown ? state.adRewardAmount : state.fallbackAdReward;
-                state.balance += reward;
-                state.energy = Math.min(state.maxEnergy, state.energy + reward);
-                state.lastRegenTimestamp = Date.now();
-                state.adCooldownUntil = Date.now() + 30000; 
-                updateUI();
-
-                const message = adWasShown
-                    ? `🎉 +${reward} points & energy from ad!`
-                    : `🎁 +${reward} bonus points (no ad available)`;
-                showToast(message, 3000);
-
-                if (tg?.HapticFeedback) {
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-                debugLog(`Ad reward granted: ${reward} (adWasShown=${adWasShown})`);
-            }
-
-            function grantFullscreenReward(adWasShown = false) {
-                const reward = adWasShown ? state.fullscreenRewardAmount : state.fallbackFullscreenReward;
-                state.balance += reward;
-                state.energy = Math.min(state.maxEnergy, state.energy + reward);
-                state.lastRegenTimestamp = Date.now();
-                state.fullscreenCooldownUntil = Date.now() + 60000; 
-                updateUI();
-
-                const message = adWasShown
-                    ? `🏅 +${reward} points from fullscreen ad!`
-                    : `🎁 +${reward} bonus points (no fullscreen available)`;
-                showToast(message, 3000);
-
-                if (tg?.HapticFeedback) {
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-                debugLog(`Fullscreen reward granted: ${reward} (adWasShown=${adWasShown})`);
-            }
-
-            // ================================================================
-            //  AD HANDLERS
-            // ================================================================
-            async function handleRewardAd() {
-                const now = Date.now();
-                if (now < state.adCooldownUntil) {
-                    showToast('⏳ Ad cooldown active. Please wait.');
-                    return;
-                }
-
-                showToast('📺 Loading reward ad...');
-                debugLog('Attempting to load reward ad...');
-
-                if (window.tads && typeof window.tads.init === 'function') {
-                    try {
-                        const widgetId = '9904';
-                        const containerId = `tads-reward-container-${widgetId}-${Date.now()}`;
-
-                        const tempContainer = document.createElement('div');
-                        tempContainer.id = containerId;
-                        tempContainer.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
-                        document.body.appendChild(tempContainer);
-
-                        let rewardGranted = false;
-
-                        const safetyTimeout = setTimeout(() => {
-                            if (!rewardGranted) {
-                                rewardGranted = true;
-                                debugLog('Ad load timeout — granting fallback reward');
-                                tempContainer.remove();
-                                grantAdReward(false);
-                            }
-                        }, 5000);
-
-                        const controller = window.tads.init({
-                            widgetId: widgetId,
-                            type: 'static',
-                            debug: false,
-                            onAdsNotFound: () => {
-                                debugLog('onAdsNotFound — no reward ads available');
-                                if (!rewardGranted) {
-                                    rewardGranted = true;
-                                    clearTimeout(safetyTimeout);
-                                    tempContainer.remove();
-                                    grantAdReward(false); 
-                                }
-                            },
-                            onClickReward: (adId, extra) => {
-                                debugLog('Reward ad clicked', adId, extra);
-                                if (!rewardGranted) {
-                                    rewardGranted = true;
-                                    clearTimeout(safetyTimeout);
-                                    tempContainer.remove();
-                                    grantAdReward(true); 
-                                }
-                            }
-                        });
-
-                        await controller.loadAd();
-                        await controller.showAd();
-
-                        if (!rewardGranted) {
-                            rewardGranted = true;
-                            clearTimeout(safetyTimeout);
-                            setTimeout(() => {
-                                tempContainer.remove();
-                                grantAdReward(true);
-                            }, 1500);
-                        }
-
-                        setTimeout(() => {
-                            try { controller.destroy(); } catch(e) {}
-                            tempContainer.remove();
-                        }, 6000);
-
-                    } catch (err) {
-                        debugLog('Reward ad error:', err);
-                        grantAdReward(false);
-                    }
-                } else {
-                    debugLog('TADS not available — granting fallback reward');
-                    grantAdReward(false);
-                }
-            }
-
-            async function handleFullscreenAd() {
-                const now = Date.now();
-                if (now < state.fullscreenCooldownUntil) {
-                    showToast('⏳ Fullscreen cooldown active.');
-                    return;
-                }
-
-                showToast('🖥️ Preparing fullscreen ad...');
-                debugLog('Attempting to load fullscreen ad...');
-
-                if (window.tads && typeof window.tads.init === 'function') {
-                    try {
-                        let rewardGranted = false;
-
-                        const safetyTimeout = setTimeout(() => {
-                            if (!rewardGranted) {
-                                rewardGranted = true;
-                                debugLog('Fullscreen timeout — granting fallback reward');
-                                grantFullscreenReward(false);
-                            }
-                        }, 6000);
-
-                        const controller = window.tads.init({
-                            widgetId: '9905',
-                            type: 'fullscreen',
-                            debug: false,
-                            onAdsNotFound: () => {
-                                debugLog('onAdsNotFound — no fullscreen ads available');
-                                if (!rewardGranted) {
-                                    rewardGranted = true;
-                                    clearTimeout(safetyTimeout);
-                                    grantFullscreenReward(false); 
-                                }
-                            },
-                            onShowReward: (result) => {
-                                debugLog('Fullscreen reward:', result);
-                                if (!rewardGranted) {
-                                    rewardGranted = true;
-                                    clearTimeout(safetyTimeout);
-                                    grantFullscreenReward(true); 
-                                }
-                            }
-                        });
-
-                        await controller.showAd();
-
-                        if (!rewardGranted) {
-                            rewardGranted = true;
-                            clearTimeout(safetyTimeout);
-                            setTimeout(() => {
-                                grantFullscreenReward(true);
-                            }, 1000);
-                        }
-
-                    } catch (err) {
-                        debugLog('Fullscreen error:', err);
-                        grantFullscreenReward(false);
-                    }
-                } else {
-                    debugLog('TADS not available — granting fallback fullscreen reward');
-                    grantFullscreenReward(false);
-                }
-            }
-
-            rewardAdBtn.addEventListener('click', handleRewardAd);
-            fullscreenAdBtn.addEventListener('click', handleFullscreenAd);
-
-            // ---------- Energy regen loop ----------
-            setInterval(() => {
-                regenerateEnergy();
-                updateUI();
-            }, 1000);
-
-            // ---------- Initial UI ----------
-            updateUI();
-            debugLog('Tap to Earn TMA initialized with fallback rewards');
-
-            // ---------- Cloud Storage (optional) ----------
-            if (tg?.CloudStorage) {
-                tg.CloudStorage.getItem('tapEarnState', (err, value) => {
-                    if (!err && value) {
-                        try {
-                            const saved = JSON.parse(value);
-                            state.balance = saved.balance || 0;
-                            state.totalTaps = saved.totalTaps || 0;
-                            state.energy = saved.energy ?? 100;
-                            updateUI();
-                            debugLog('State loaded from cloud');
-                        } catch(e) { debugLog('Failed to parse saved state'); }
-                    }
+            
+            try {
+                // Create ad controller (Static = Text-Graphic Block)
+                const adController = window.tads.init({
+                    widgetId: WIDGET_ID,
+                    type: 'static',          // TGB uses static type
+                    debug: IS_DEBUG_MODE,
+                    onShowReward: onShowRewardHandler,
+                    onClickReward: onClickRewardHandler,
+                    onAdsNotFound: adsNotFoundCallback
                 });
+                
+                // Load the ad first, then show inside the container
+                adController.loadAd()
+                    .then(() => {
+                        updateStatusMessage('🎬 Showing ad...');
+                        return adController.showAd();
+                    })
+                    .then(() => {
+                        updateStatusMessage('📢 Active');
+                        console.log('TADS ad displayed successfully');
+                    })
+                    .catch((err) => {
+                        console.error('TADS error:', err);
+                        updateStatusMessage('❌ Failed to load ad', true);
+                        adsNotFoundCallback();
+                    });
+                return true;
+            } catch (err) {
+                console.error('Init exception:', err);
+                updateStatusMessage('Init error', true);
+                adsNotFoundCallback();
+                return false;
             }
-
-            setInterval(() => {
-                if (tg?.CloudStorage) {
-                    tg.CloudStorage.setItem('tapEarnState', JSON.stringify({
-                        balance: state.balance,
-                        totalTaps: state.totalTaps,
-                        energy: state.energy,
-                    }));
+        }
+        
+        // Robust widget initializer: waits for window.tads to be ready
+        // This replicates the advanced async-ready pattern from docs
+        const initTadsWidget = function() {
+            // If tads already available, directly start
+            if (window.tads && window.tads.init) {
+                initAdController();
+                return;
+            }
+            
+            // Otherwise poll every 100ms until script loads (max 5 seconds)
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds (50 * 100ms)
+            const tadsInterval = setInterval(() => {
+                attempts++;
+                if (window.tads && window.tads.init) {
+                    clearInterval(tadsInterval);
+                    initAdController();
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(tadsInterval);
+                    console.error('TADS script did not load in time');
+                    updateStatusMessage('⏱️ Load timeout', true);
+                    tg.showPopup({
+                        title: 'Ad service unavailable',
+                        message: 'Could not load ad widget. Please check your internet or try later.',
+                        buttons: [{ type: 'close' }]
+                    });
                 }
-            }, 10000);
+            }, 100);
+        };
+        
+        // Ensure DOM is fully loaded before trying to init widget (container exists)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTadsWidget);
+        } else {
+            initTadsWidget();
+        }
+        
+        // ============================================================
+        // 5. OPTIONAL: Add manual reload / test button (informative only)
+        //    Since the widget loads once, we just provide a console tip
+        // ============================================================
+        // For advanced use — we create a hidden but useful instruction;
+        // The ad will be automatically loaded with correct container ID.
+        console.log(`Telegram Mini App + TADS | Widget ID: ${WIDGET_ID} | Debug: ${IS_DEBUG_MODE}`);
+        
+        // Optional: handle theme changes (Telegram sends theme update)
+        tg.onEvent('themeChanged', () => {
+            // CSS variables already applied by Telegram WebApp runtime automatically.
+            console.log('Theme updated, TADS container remains');
+        });
+        
+        // handle closing/closing event gracefully
+        tg.onEvent('viewportChanged', () => {
+            // ensure ad container gets proper sizing if needed (no extra)
+        });
+        
+        // In case WIDGET_ID is default placeholder, display warning but do not break.
+        if (WIDGET_ID === '9711') {
+            const warnDiv = document.createElement('div');
+            warnDiv.style.backgroundColor = 'rgba(255, 100, 100, 0.2)';
+            warnDiv.style.padding = '12px';
+            warnDiv.style.borderRadius = '16px';
+            warnDiv.style.marginTop = '20px';
+            warnDiv.style.fontSize = '0.8rem';
+            warnDiv.style.border = '1px solid var(--tg-theme-destructive-text-color, #ff5e5e)';
+            warnDiv.innerHTML = '⚠️ <strong>Widget ID not configured</strong><br>Please replace <code>YOUR_WIDGET_ID</code> inside the script with your actual TADS widget ID. Until then, ads won’t load.';
+            document.querySelector('.container').appendChild(warnDiv);
+            updateStatusMessage('❗ Invalid Widget ID', true);
+        }
+    })();
+</script>
 
-        })();
-    </script>
+<!-- TADS Async Script: loads widget core in non-blocking way -->
+<script src="https://w.tads.me/widget.js" async></script>
+
+<!-- 
+    ================================================================
+    INTEGRATION NOTES (for developers):
+    - This mini app uses the async widget method to speed up loading.
+    - Widget container ID is dynamically built as "tads-container-YOUR_WIDGET_ID"
+    - TGB (Text-Graphic Block) automatically displays ad after load&show.
+    - Reward callbacks trigger native Telegram popups + haptics.
+    - All styling adapts to Telegram theme (light/dark mode).
+    - Debug mode is OFF in production. Set IS_DEBUG_MODE = true for testing (no stats).
+    ================================================================
+-->
 </body>
 </html>
