@@ -210,14 +210,14 @@
 <body>
     <h1>🧪 tads Publisher Sandbox</h1>
     <div class="subtitle">
-        📋 Dashboard widgets: <strong>#9642 (Personal blog)</strong> | <strong>#9643(Personal blog1)</strong> — TGB / Fullscreen ready
+        📋 Dashboard widgets: <strong>#9904 (Personal blog)</strong> | <strong>#9905(Personal blog1)</strong> — TGB / Fullscreen ready
     </div>
 
     <div id="debugContainer" class="debug-box hidden"></div>
 
     <div class="quick-select">
-        <div class="widget-btn" data-widget="9642" data-name="Personal blog">📰 #9642· Personal blog</div>
-        <div class="widget-btn" data-widget="9643" data-name="Personal blog1">✍️ #9643 · Personal blog1</div>
+        <div class="widget-btn" data-widget="9904" data-name="Personal blog">📰 #9904· Personal blog</div>
+        <div class="widget-btn" data-widget="9904" data-name="Personal blog1">✍️ #9905 · Personal blog1</div>
     </div>
 
     <form id="adForm">
@@ -325,7 +325,7 @@
 
             // State
             let currentAdController = null;
-            let currentWidgetId = '9642';
+            let currentWidgetId = '9904';
             let noAdsHandled = false;
 
             // ---------- UI Helpers ----------
@@ -518,8 +518,8 @@
                     if (wid) {
                         widgetIdInput.value = wid;
                         nameInput.value = wName || '';
-                        if (wid === '9642') descInput.value = 'Blog widget from dashboard #9642 — Personal blog (TGB)';
-                        else if (wid === '9643') descInput.value = 'Blog widget from dashboard #9643— Personal blog1 (TGB)';
+                        if (wid === '9904') descInput.value = 'Blog widget from dashboard #9642 — Personal blog (TGB)';
+                        else if (wid === '9905') descInput.value = 'Blog widget from dashboard #9643— Personal blog1 (TGB)';
                         setActiveWidgetUI(wid);
                         showMessage('success', `Selected ${wName} (#${wid})`);
                         resetAdUI();   // clear previous ad preview
@@ -547,8 +547,8 @@
             });
 
             // initial default
-            setActiveWidgetUI('9642');
-            widgetIdInput.value = '9642';
+            setActiveWidgetUI('9904');
+            widgetIdInput.value = '9904';
             nameInput.value = 'Personal blog';
             descInput.value = 'Blog widget from dashboard #9642— Personal blog (TGB)';
 
