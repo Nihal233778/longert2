@@ -1,21 +1,20 @@
-       
- <!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>tads Publisher TMA · Personal blog widgets</title>
+    <title>Tap to Earn · tads Rewarded Widget</title>
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js?61"></script>
     <!-- tads widget (must be loaded before usage) -->
     <script src="https://w.tads.me/widget.js"></script>
- <!eruda>
-     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
- <!install eruda>
-  <script>eruda.init();</script>
+    <!-- eruda debug console (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
     <style>
         * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -25,39 +24,153 @@
             background: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
             transition: background 0.2s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         h1 {
-            font-size: 26px;
-            margin-bottom: 6px;
-            font-weight: 620;
-            letter-spacing: -0.3px;
+            font-size: 28px;
+            margin-bottom: 4px;
+            font-weight: 650;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .subtitle {
             font-size: 14px;
             color: var(--tg-theme-hint-color, #8e8e93);
-            margin-bottom: 20px;
-            border-left: 3px solid var(--tg-theme-button-color, #40a7e3);
-            padding-left: 12px;
+            margin-bottom: 24px;
+            border-left: 4px solid var(--tg-theme-button-color, #40a7e3);
+            padding-left: 14px;
+            line-height: 1.4;
         }
 
-        .quick-select {
+        .balance-card {
+            background: linear-gradient(145deg, var(--tg-theme-button-color, #40a7e3), #2b8fd9);
+            border-radius: 28px;
+            padding: 22px 24px;
+            margin-bottom: 24px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0, 100, 200, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.1s ease;
+        }
+
+        .balance-card:active {
+            transform: scale(0.98);
+        }
+
+        .balance-label {
+            font-size: 15px;
+            opacity: 0.85;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .balance-value {
+            font-size: 40px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .coin-icon {
+            font-size: 32px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .tap-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 16px 0 24px;
+            min-height: 220px;
+        }
+
+        .tap-button {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffdd44, #ffaa00);
+            border: none;
+            box-shadow: 0 12px 0 #b37400, 0 14px 20px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.08s ease;
+            color: #4a2e00;
+            font-weight: 800;
+            font-size: 22px;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            margin-bottom: 14px;
+        }
+
+        .tap-button:active {
+            transform: translateY(8px);
+            box-shadow: 0 4px 0 #b37400, 0 10px 16px rgba(0,0,0,0.2);
+        }
+
+        .tap-button:disabled {
+            opacity: 0.5;
+            transform: translateY(8px);
+            box-shadow: 0 4px 0 #7a5500;
+            cursor: not-allowed;
+        }
+
+        .tap-hint {
+            font-size: 15px;
+            color: var(--tg-theme-hint-color, #8e8e93);
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .reward-badge {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f2);
+            border-radius: 40px;
+            padding: 10px 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--tg-theme-text-color, #000);
+            border: 1px solid var(--tg-theme-hint-color, #d9d9e3);
+            margin-bottom: 8px;
+        }
+
+        .widget-selector {
             display: flex;
             gap: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 18px;
             flex-wrap: wrap;
         }
 
         .widget-btn {
             flex: 1;
-            min-width: 140px;
-            padding: 12px 10px;
+            min-width: 130px;
+            padding: 12px 8px;
             background: var(--tg-theme-secondary-bg-color, #f0f0f2);
             border: 1.5px solid var(--tg-theme-button-color, #40a7e3);
             border-radius: 60px;
             color: var(--tg-theme-text-color, #000000);
-            font-weight: 590;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             text-align: center;
@@ -73,7 +186,7 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         label {
@@ -91,7 +204,6 @@
             border-radius: 14px;
             background: var(--tg-theme-secondary-bg-color, #f9f9fb);
             color: var(--tg-theme-text-color, #000000);
-            box-sizing: border-box;
             font-size: 16px;
             font-family: inherit;
         }
@@ -104,81 +216,83 @@
 
         textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 70px;
         }
 
-        button {
+        .action-btn {
             width: 100%;
-            padding: 14px 24px;
+            padding: 16px 24px;
             background: var(--tg-theme-button-color, #40a7e3);
             color: var(--tg-theme-button-text-color, #ffffff);
             border: none;
             border-radius: 60px;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 17px;
+            font-weight: 700;
             cursor: pointer;
             transition: opacity 0.2s, transform 0.1s;
             margin-top: 8px;
+            letter-spacing: 0.3px;
         }
 
-        button:active {
+        .action-btn:active {
             opacity: 0.85;
             transform: scale(0.98);
         }
 
-        button:disabled {
+        .action-btn:disabled {
             opacity: 0.55;
             cursor: not-allowed;
-        }
-
-        #adSection {
-            margin-top: 36px;
-            padding-top: 20px;
-            border-top: 1px solid var(--tg-theme-hint-color, #e5e5ea);
-        }
-
-        #staticAdContainer {
-            min-height: 120px;
-            margin: 16px 0;
-            border-radius: 20px;
-            background: var(--tg-theme-secondary-bg-color, #fafafc);
-            padding: 8px;
-        }
-
-        #fullscreenTrigger {
-            margin-top: 16px;
         }
 
         .hidden {
             display: none !important;
         }
 
-        .success-message {
-            background: #34c759;
-            color: white;
-            padding: 12px 18px;
+        .message-toast {
+            padding: 14px 20px;
             border-radius: 60px;
-            margin-bottom: 20px;
+            margin: 10px 0;
             text-align: center;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 15px;
+            animation: slideUp 0.25s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .error-message {
-            background: #ff3b30;
-            color: white;
-            padding: 12px 18px;
-            border-radius: 60px;
-            margin-bottom: 20px;
-            text-align: center;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .info-message {
-            background: #007aff;
+        .success-message { background: #34c759; color: white; }
+        .error-message { background: #ff3b30; color: white; }
+        .info-message { background: #007aff; color: white; }
+        .warning-message { background: #ff9500; color: white; }
+
+        #adPreviewSection {
+            margin-top: 28px;
+            border-top: 2px dashed var(--tg-theme-hint-color, #e5e5ea);
+            padding-top: 22px;
+        }
+
+        .ad-container-wrapper {
+            background: var(--tg-theme-secondary-bg-color, #fafafc);
+            border-radius: 20px;
+            padding: 12px;
+            min-height: 120px;
+            margin: 16px 0;
+            border: 1px solid var(--tg-theme-hint-color, #e5e5ea);
+        }
+
+        .badge-id {
+            background: var(--tg-theme-button-color, #40a7e3);
             color: white;
-            padding: 12px 18px;
-            border-radius: 60px;
-            margin-bottom: 20px;
-            text-align: center;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 8px;
         }
 
         .debug-box {
@@ -187,98 +301,136 @@
             padding: 12px;
             border-radius: 16px;
             font-family: 'SF Mono', monospace;
-            font-size: 11px;
-            margin-top: 20px;
+            font-size: 10px;
+            margin-top: 16px;
             white-space: pre-wrap;
-            max-height: 200px;
+            max-height: 160px;
             overflow-y: auto;
             border: 1px solid #2c2c2e;
+            opacity: 0.9;
         }
 
-        .widget-badge {
-            background: var(--tg-theme-button-color, #40a7e3);
-            color: white;
-            padding: 4px 14px;
-            border-radius: 40px;
-            font-size: 13px;
-            font-weight: 500;
-            display: inline-block;
-            margin-left: 10px;
+        .reward-highlight {
+            animation: pulse 0.6s ease 2;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        .small-note {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color, #8e8e93);
+            margin-top: 6px;
+            text-align: center;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
         }
     </style>
 </head>
 <body>
-    <h1>🧪 tads Publisher Sandbox</h1>
+    <h1>🪙 Tap to Earn</h1>
     <div class="subtitle">
-        📋 Dashboard widgets: <strong>#9904 (Personal blog)</strong> | <strong>#9905(Personal blog1)</strong> — TGB / Fullscreen ready
+        Rewarded widget · <strong>Personal blog #9904 / #9905</strong> — tap, watch, earn coins
     </div>
 
-    <div id="debugContainer" class="debug-box hidden"></div>
-
-    <div class="quick-select">
-        <div class="widget-btn" data-widget="9904" data-name="Personal blog">📰 #9904· Personal blog</div>
-        <div class="widget-btn" data-widget="9905" data-name="Personal blog1">✍️ #9905· Personal blog1</div>
+    <!-- Balance card -->
+    <div class="balance-card" id="balanceCard">
+        <div>
+            <div class="balance-label">Your balance</div>
+            <div class="balance-value">
+                <span class="coin-icon">🪙</span>
+                <span id="coinBalance">0</span>
+            </div>
+        </div>
+        <div style="font-size: 42px; opacity: 0.35;">💰</div>
     </div>
 
-    <form id="adForm">
-        <div class="form-group">
-            <label for="widgetId">🆔 Widget ID *</label>
-            <input type="text" id="widgetId" name="widgetId" required value="9642" placeholder="9642or 9643">
+    <!-- Tap area -->
+    <div class="tap-area">
+        <button class="tap-button" id="tapButton">
+            <span style="font-size: 40px; line-height: 1;">👆</span>
+            TAP
+        </button>
+        <div class="reward-badge" id="rewardBadge">
+            <span>🏆</span> <span id="rewardAmountLabel">+10</span> coins per ad
         </div>
-
-        <div class="form-group">
-            <label for="adType">📦 Ad Format</label>
-            <select id="adType" name="adType">
-                <option value="static" selected>📄 Text-Graphic Block (TGB)</option>
-                <option value="fullscreen">🖥️ Fullscreen Banner</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="rewardType">🎁 Reward Type</label>
-            <select id="rewardType" name="rewardType">
-                <option value="rewarded">🏆 Rewarded (click/view reward)</option>
-                <option value="non-rewarded">🔹 Non-rewarded</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="name">📛 Name</label>
-            <input type="text" id="name" name="name" value="Personal blog">
-        </div>
-
-        <div class="form-group">
-            <label for="description">📝 Description</label>
-            <textarea id="description" name="description">Blog widget from tads dashboard — #9642 (Personal blog)</textarea>
-        </div>
-
-        <button type="submit" id="submitBtn">🚀 Load Ad</button>
-    </form>
-
-    <div id="adSection" class="hidden">
-        <h2 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            🎯 Ad Preview 
-            <span id="activeWidgetBadge" class="widget-badge">#9642</span>
-        </h2>
-        <div id="staticAdContainer"></div>
-        <button id="fullscreenTrigger" class="hidden">✨ Show Fullscreen Ad</button>
+        <div class="tap-hint" id="tapHint">Tap to load a rewarded ad</div>
     </div>
 
+    <!-- Widget quick selector -->
+    <div class="widget-selector">
+        <div class="widget-btn active" data-widget="9904" data-name="Personal blog">📰 #9904 · Personal blog</div>
+        <div class="widget-btn" data-widget="9905" data-name="Personal blog1">✍️ #9905 · Personal blog1</div>
+    </div>
+
+    <!-- Configuration (collapsible / minimal) -->
+    <details style="margin-bottom: 20px;">
+        <summary style="font-size: 14px; font-weight: 600; color: var(--tg-theme-hint-color); cursor: pointer; padding: 8px 0;">
+            ⚙️ Advanced settings (Widget ID, reward type)
+        </summary>
+        <div style="padding: 14px 0 0;">
+            <div class="form-group">
+                <label for="widgetId">🆔 Widget ID</label>
+                <input type="text" id="widgetId" name="widgetId" value="9904" placeholder="9904 or 9905">
+            </div>
+            <div class="form-group">
+                <label for="rewardType">🎁 Reward on</label>
+                <select id="rewardType">
+                    <option value="rewarded" selected>🏆 Rewarded (click/view reward)</option>
+                    <option value="non-rewarded">🔹 Non-rewarded (test only)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="name">📛 Widget name</label>
+                <input type="text" id="name" value="Personal blog">
+            </div>
+            <div class="form-group">
+                <label for="description">📝 Description</label>
+                <textarea id="description">Tap to earn rewards — tads widget #9904</textarea>
+            </div>
+        </div>
+    </details>
+
+    <!-- Ad preview container (static ad will be injected here) -->
+    <div id="adPreviewSection" class="hidden">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <span style="font-size: 20px;">🎯</span>
+            <strong style="font-size: 17px;">Ad preview</strong>
+            <span id="activeWidgetBadge" class="badge-id">#9904</span>
+        </div>
+        <div class="ad-container-wrapper" id="staticAdContainer"></div>
+        <div id="rewardStatusMessage" style="margin-top: 8px;"></div>
+    </div>
+
+    <!-- Messages -->
     <div id="messageContainer"></div>
+
+    <!-- Debug console (collapsible) -->
+    <details style="margin-top: 20px;">
+        <summary style="font-size: 12px; color: var(--tg-theme-hint-color); cursor: pointer;">🔍 Debug log</summary>
+        <div id="debugContainer" class="debug-box"></div>
+    </details>
 
     <script>
         (function() {
-            // catch unhandled rejections to avoid silent crashes
+            // ---- global error catch ----
             window.addEventListener('unhandledrejection', function(event) {
-                console.error('[TADS] Unhandled promise rejection:', event.reason);
+                console.error('[TAP] Unhandled rejection:', event.reason);
             });
 
-            // ---------- Debug logger ----------
+            // ---- debug logger ----
             function debugLog(...args) {
-                console.log('[TADS-TEST]', ...args);
+                console.log('[TAP-EARN]', ...args);
                 const debugDiv = document.getElementById('debugContainer');
                 if (debugDiv) {
-                    debugDiv.classList.remove('hidden');
                     const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
                     const line = args.map(arg => {
                         try {
@@ -294,60 +446,80 @@
                 }
             }
 
-            function clearDebug() {
-                const debugDiv = document.getElementById('debugContainer');
-                if (debugDiv) debugDiv.innerHTML = '';
-                debugLog('Debug panel cleared');
-            }
-
-            // Telegram WebApp init
+            // ---- Telegram WebApp ----
             const tg = window.Telegram?.WebApp;
             if (tg) {
                 tg.expand();
                 tg.ready();
-                debugLog('Telegram WebApp ready, theme applied');
+                debugLog('Telegram WebApp ready');
             }
 
-            // DOM elements
-            const form = document.getElementById('adForm');
+            // ---- DOM elements ----
+            const tapButton = document.getElementById('tapButton');
+            const coinBalanceEl = document.getElementById('coinBalance');
+            const rewardAmountLabel = document.getElementById('rewardAmountLabel');
+            const tapHint = document.getElementById('tapHint');
+            const balanceCard = document.getElementById('balanceCard');
+            const adPreviewSection = document.getElementById('adPreviewSection');
+            const staticAdContainer = document.getElementById('staticAdContainer');
+            const activeWidgetBadge = document.getElementById('activeWidgetBadge');
+            const rewardStatusMessage = document.getElementById('rewardStatusMessage');
+            const msgContainer = document.getElementById('messageContainer');
+
+            // Config inputs
             const widgetIdInput = document.getElementById('widgetId');
-            const adTypeSelect = document.getElementById('adType');
             const rewardTypeSelect = document.getElementById('rewardType');
             const nameInput = document.getElementById('name');
             const descInput = document.getElementById('description');
-            const submitBtn = document.getElementById('submitBtn');
-            const adSection = document.getElementById('adSection');
-            const staticContainer = document.getElementById('staticAdContainer');
-            const fullscreenBtn = document.getElementById('fullscreenTrigger');
-            const msgContainer = document.getElementById('messageContainer');
-            const activeWidgetBadge = document.getElementById('activeWidgetBadge');
+
             const widgetBtns = document.querySelectorAll('.widget-btn');
 
-            // State
+            // ---- State ----
             let currentAdController = null;
-            let currentWidgetId = '9642';
+            let currentWidgetId = '9904';
+            let coinBalance = 0;
             let noAdsHandled = false;
+            let isAdLoading = false;
+            let lastRewardTime = 0;
 
-            // ---------- UI Helpers ----------
-            function showMessage(type, text) {
+            // ---- UI helpers ----
+            function showMessage(type, text, duration = 3500) {
                 const msgDiv = document.createElement('div');
-                msgDiv.className = type === 'success' ? 'success-message' : (type === 'info' ? 'info-message' : 'error-message');
+                msgDiv.className = `message-toast ${type}-message`;
                 msgDiv.textContent = text;
                 msgContainer.innerHTML = '';
                 msgContainer.appendChild(msgDiv);
-                setTimeout(() => msgDiv.remove(), 4500);
+                setTimeout(() => msgDiv.remove(), duration);
+            }
+
+            function updateBalanceUI(animate = false) {
+                coinBalanceEl.textContent = coinBalance;
+                if (animate) {
+                    balanceCard.classList.add('reward-highlight');
+                    setTimeout(() => balanceCard.classList.remove('reward-highlight'), 700);
+                }
+            }
+
+            function addCoins(amount) {
+                coinBalance += amount;
+                updateBalanceUI(true);
+                debugLog(`+${amount} coins, new balance: ${coinBalance}`);
             }
 
             function resetAdUI() {
-                debugLog('Resetting ad UI & destroying controller');
-                adSection.classList.add('hidden');
-                staticContainer.innerHTML = '';
-                fullscreenBtn.classList.add('hidden');
+                debugLog('Resetting ad UI');
+                adPreviewSection.classList.add('hidden');
+                staticAdContainer.innerHTML = '';
+                rewardStatusMessage.innerHTML = '';
                 if (currentAdController && typeof currentAdController.destroy === 'function') {
                     try { currentAdController.destroy(); } catch(e) { debugLog('destroy error', e); }
                 }
                 currentAdController = null;
                 noAdsHandled = false;
+                isAdLoading = false;
+                tapButton.disabled = false;
+                tapHint.textContent = 'Tap to load a rewarded ad';
+                tapButton.style.opacity = '1';
             }
 
             function setActiveWidgetUI(widgetId) {
@@ -357,10 +529,11 @@
                 });
                 if (activeWidgetBadge) activeWidgetBadge.textContent = `#${widgetId}`;
                 currentWidgetId = widgetId;
-                debugLog(`Active widget switched to #${widgetId}`);
+                widgetIdInput.value = widgetId;
+                debugLog(`Active widget: #${widgetId}`);
             }
 
-            // ---------- tads readiness check ----------
+            // ---- tads readiness ----
             function isTadsReady() {
                 return !!(window.tads && typeof window.tads.init === 'function');
             }
@@ -368,16 +541,16 @@
             function waitForTads(timeout = 8000) {
                 return new Promise((resolve, reject) => {
                     if (isTadsReady()) return resolve();
-                    debugLog('Waiting for tads.me/widget.js to become available...');
+                    debugLog('Waiting for tads library...');
                     const start = Date.now();
                     const interval = setInterval(() => {
                         if (isTadsReady()) {
                             clearInterval(interval);
-                            debugLog('tads library ready');
+                            debugLog('tads ready');
                             resolve();
                         } else if (Date.now() - start > timeout) {
                             clearInterval(interval);
-                            reject(new Error('tads script did not load in time'));
+                            reject(new Error('tads script timeout'));
                         }
                     }, 100);
                 });
@@ -387,10 +560,15 @@
                 return id.toString().replace(/^#/, '').trim();
             }
 
-            // ---------- Core ad loader (fixed container convention) ----------
-            async function loadAd(widgetId, adType, rewardType) {
-                clearDebug();
-                debugLog(`loadAd start — widget:${widgetId}, type:${adType}, reward:${rewardType}`);
+            // ---- Core rewarded ad loader (static TGB format, tap to earn) ----
+            async function loadAndShowRewardedAd(widgetId, rewardType) {
+                if (isAdLoading) {
+                    debugLog('Ad already loading, ignoring tap');
+                    return;
+                }
+                isAdLoading = true;
+                tapButton.disabled = true;
+                tapHint.textContent = '⏳ Loading ad...';
                 noAdsHandled = false;
 
                 try {
@@ -398,119 +576,120 @@
                     const normalizedId = normalizeWidgetId(widgetId);
                     if (!normalizedId) throw new Error('Empty widget ID');
 
-                    resetAdUI();
-                    setActiveWidgetUI(normalizedId);
-
-                    // IMPORTANT: for static ads, create container with EXACT id format "tads-container-{widgetId}"
-                    if (adType === 'static') {
-                        const requiredContainerId = `tads-container-${normalizedId}`;
-                        debugLog(`Creating static container with ID: ${requiredContainerId}`);
-                        staticContainer.innerHTML = `<div id="${requiredContainerId}" style="min-height:120px; width:100%;"></div>`;
-                        const containerEl = document.getElementById(requiredContainerId);
-                        if (!containerEl) {
-                            throw new Error(`Failed to create container #${requiredContainerId}`);
-                        }
-                        debugLog(`Container verified: ${!!containerEl}`);
+                    // Clean previous instance
+                    if (currentAdController && typeof currentAdController.destroy === 'function') {
+                        try { currentAdController.destroy(); } catch(e) {}
                     }
+                    currentAdController = null;
 
-                    // Define callbacks
-                    const onAdsNotFound = () => {
-                        debugLog(`onAdsNotFound triggered for ${normalizedId}`);
-                        if (!noAdsHandled) {
-                            noAdsHandled = true;
-                            showMessage('info', `ℹ️ No active campaigns for Widget #${normalizedId} right now.`);
-                            adSection.classList.add('hidden');
-                        }
-                    };
+                    // Static TGB container with EXACT id format
+                    const requiredContainerId = `tads-container-${normalizedId}`;
+                    staticAdContainer.innerHTML = `<div id="${requiredContainerId}" style="min-height:120px; width:100%;"></div>`;
+                    const containerEl = document.getElementById(requiredContainerId);
+                    if (!containerEl) throw new Error(`Container #${requiredContainerId} not created`);
 
+                    // Reward callbacks
                     let onClickReward = null;
                     let onShowReward = null;
 
+                    // For rewarded TGB: we want reward on click (or view for fullscreen, but we use static TGB)
+                    // Note: TGB rewarded typically triggers onClickReward when user clicks the ad.
                     if (rewardType === 'rewarded') {
-                        if (adType === 'static') {
-                            onClickReward = (adId, extra) => {
-                                debugLog(`🎁 Click reward received! adId: ${adId}`, extra);
-                                showMessage('success', `🎉 Click reward granted for #${normalizedId}`);
-                            };
-                        } else if (adType === 'fullscreen') {
-                            onShowReward = (result) => {
-                                debugLog(`🎬 Fullscreen view reward:`, result);
-                                showMessage('success', `🏅 Fullscreen reward delivered for #${normalizedId}`);
-                            };
-                        }
+                        onClickReward = (adId, extra) => {
+                            debugLog(`🎁 Click reward! adId: ${adId}`, extra);
+                            const rewardAmount = 10;
+                            addCoins(rewardAmount);
+                            showMessage('success', `🎉 +${rewardAmount} coins earned!`);
+                            rewardStatusMessage.innerHTML = `<span style="color: #34c759;">✅ Reward received! +${rewardAmount} coins</span>`;
+                            // Re-enable tap after reward
+                            tapButton.disabled = false;
+                            tapHint.textContent = 'Tap to earn more';
+                        };
                     }
 
-                    debugLog(`Initializing tads with widgetId=${normalizedId}, type=${adType}`);
+                    debugLog(`Initializing tads (static/rewarded) widget #${normalizedId}`);
                     const controller = window.tads.init({
                         widgetId: normalizedId,
-                        type: adType,
-                        debug:false,        // set to false for cleaner production, logs are handled by us
+                        type: 'static',               // tap to earn uses static TGB
+                        debug: false,
                         onClickReward: onClickReward,
                         onShowReward: onShowReward,
-                        onAdsNotFound: onAdsNotFound
+                        onAdsNotFound: () => {
+                            debugLog('onAdsNotFound fired');
+                            if (!noAdsHandled) {
+                                noAdsHandled = true;
+                                showMessage('info', `ℹ️ No active campaigns for widget #${normalizedId}`);
+                                adPreviewSection.classList.add('hidden');
+                                tapButton.disabled = false;
+                                tapHint.textContent = 'No ads available — try again later';
+                                isAdLoading = false;
+                            }
+                        }
                     });
 
                     currentAdController = controller;
-                    debugLog(`Controller obtained: ${!!currentAdController}`);
+                    debugLog('Controller created, calling loadAd()...');
+                    await currentAdController.loadAd();
+                    debugLog('loadAd resolved, calling showAd()...');
+                    await currentAdController.showAd();
+                    debugLog('showAd resolved — ad should be visible');
 
-                    if (adType === 'static') {
-                        debugLog('Calling loadAd() on controller...');
-                        await currentAdController.loadAd();
-                        debugLog('loadAd() resolved');
-                        await currentAdController.showAd();
-                        debugLog('showAd() resolved — ad should be displayed');
-                        adSection.classList.remove('hidden');
-                        showMessage('success', `✅ TGB ad loaded for #${normalizedId}`);
-                    } 
-                    else if (adType === 'fullscreen') {
-                        // fullscreen: prepare button and UI
-                        staticContainer.innerHTML = '<div style="padding: 20px; text-align: center; opacity:0.7;">✨ Fullscreen ad ready — tap button below</div>';
-                        fullscreenBtn.classList.remove('hidden');
-                        adSection.classList.remove('hidden');
+                    // Show preview section
+                    adPreviewSection.classList.remove('hidden');
+                    rewardStatusMessage.innerHTML = `<span style="color: #007aff;">👆 Tap the ad above to earn coins</span>`;
+                    
+                    // Update UI to indicate waiting for click
+                    tapHint.textContent = '👆 Tap the ad above to earn';
+                    tapButton.disabled = false;
+                    showMessage('success', `✅ Ad loaded for #${normalizedId} — tap it to earn!`);
 
-                        // Replace button to avoid duplicate listeners
-                        const newFullBtn = fullscreenBtn.cloneNode(true);
-                        fullscreenBtn.parentNode.replaceChild(newFullBtn, fullscreenBtn);
-                        const updatedFullBtn = document.getElementById('fullscreenTrigger');
-                        
-                        updatedFullBtn.addEventListener('click', async () => {
-                            if (!currentAdController) {
-                                showMessage('error', 'Controller missing, reload ad first');
-                                return;
-                            }
-                            try {
-                                debugLog('User triggered fullscreen showAd()');
-                                await currentAdController.showAd();
-                                debugLog('Fullscreen ad interaction finished');
-                            } catch (err) {
-                                debugLog('Fullscreen showAd error:', err);
-                                if (!noAdsHandled) {
-                                    noAdsHandled = true;
-                                    showMessage('info', `No fullscreen fill for #${normalizedId}`);
-                                }
-                            }
-                        });
-                        showMessage('success', `📱 Fullscreen ready for #${normalizedId}`);
+                    // If reward type is non-rewarded, we still show but no coin
+                    if (rewardType === 'non-rewarded') {
+                        rewardStatusMessage.innerHTML = `<span style="color: #8e8e93;">🔹 Non-rewarded mode — no coins will be granted</span>`;
                     }
+
                 } catch (err) {
-                    debugLog('CRITICAL ERROR in loadAd:', err);
+                    debugLog('CRITICAL ERROR in loadAndShowRewardedAd:', err);
                     const errorMsg = err?.message || String(err);
                     if (!noAdsHandled && !errorMsg.includes('onAdsNotFound')) {
-                        showMessage('error', `Ad error: ${errorMsg.substring(0, 120)}`);
+                        showMessage('error', `Ad error: ${errorMsg.substring(0, 100)}`);
                         resetAdUI();
                     } else if (noAdsHandled) {
-                        debugLog('No ads callback already handled, ignoring error toast');
-                        adSection.classList.add('hidden');
+                        debugLog('No ads callback already handled');
                     } else {
                         showMessage('error', `Failed: ${errorMsg}`);
                         resetAdUI();
                     }
+                    tapButton.disabled = false;
+                    tapHint.textContent = 'Tap to try again';
                 } finally {
-                    debugLog('loadAd finished');
+                    isAdLoading = false;
+                    if (!tapButton.disabled) {
+                        tapButton.disabled = false;
+                    }
+                    debugLog('loadAndShowRewardedAd finished');
                 }
             }
 
-            // ---------- Quick select buttons (matching screenshot #9613, #9614) ----------
+            // ---- Event: tap button ----
+            tapButton.addEventListener('click', async () => {
+                // Prevent double-tap while loading
+                if (isAdLoading) return;
+
+                const widgetId = widgetIdInput.value.trim() || currentWidgetId;
+                const rewardType = rewardTypeSelect.value;
+
+                debugLog(`Tap detected — loading rewarded ad for widget ${widgetId}, type: ${rewardType}`);
+                
+                // Add a subtle vibration if available
+                if (window.Telegram?.WebApp?.HapticFeedback) {
+                    try { tg.HapticFeedback.impactOccurred('medium'); } catch(e) {}
+                }
+
+                await loadAndShowRewardedAd(widgetId, rewardType);
+            });
+
+            // ---- Widget quick select buttons ----
             widgetBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const wid = btn.dataset.widget;
@@ -518,49 +697,47 @@
                     if (wid) {
                         widgetIdInput.value = wid;
                         nameInput.value = wName || '';
-                        if (wid === '9904') descInput.value = 'Blog widget from dashboard #9642 — Personal blog (TGB)';
-                        else if (wid === '9905') descInput.value = 'Blog widget from dashboard #9643— Personal blog1 (TGB)';
+                        descInput.value = `Tap to earn — widget #${wid} (${wName})`;
                         setActiveWidgetUI(wid);
-                        showMessage('success', `Selected ${wName} (#${wid})`);
-                        resetAdUI();   // clear previous ad preview
+                        showMessage('success', `Selected ${wName} (#${wid})`, 2000);
+                        resetAdUI();
+                        tapHint.textContent = 'Tap to load a rewarded ad';
+                        tapButton.disabled = false;
                     }
                 });
             });
 
-            // ---------- Form submission ----------
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const widgetRaw = widgetIdInput.value.trim();
-                const adType = adTypeSelect.value;
-                const rewardType = rewardTypeSelect.value;
-
-                if (!widgetRaw) {
-                    showMessage('error', 'Please enter a Widget ID');
-                    return;
+            // ---- Sync widget id input with active badge ----
+            widgetIdInput.addEventListener('change', (e) => {
+                const newId = normalizeWidgetId(e.target.value);
+                if (newId) {
+                    setActiveWidgetUI(newId);
                 }
-
-                submitBtn.disabled = true;
-                submitBtn.textContent = '⏳ Loading ad...';
-                await loadAd(widgetRaw, adType, rewardType);
-                submitBtn.disabled = false;
-                submitBtn.textContent = '🚀 Load Ad';
             });
 
-            // initial default
-            setActiveWidgetUI('9642');
-            widgetIdInput.value = '9642';
+            // ---- Initialize default ----
+            setActiveWidgetUI('9904');
+            widgetIdInput.value = '9904';
             nameInput.value = 'Personal blog';
-            descInput.value = 'Blog widget from dashboard #9642— Personal blog (TGB)';
+            descInput.value = 'Tap to earn rewards — tads widget #9904';
+            updateBalanceUI(false);
 
-            // check tads on load
+            // Check tads on load
             window.addEventListener('load', () => {
-                debugLog('Page fully loaded');
+                debugLog('Page loaded, checking tads readiness');
                 waitForTads(5000).catch(e => debugLog('tads not ready after load', e.message));
             });
+
+            // ---- Full cleanup on page unload ----
+            window.addEventListener('beforeunload', () => {
+                if (currentAdController && typeof currentAdController.destroy === 'function') {
+                    try { currentAdController.destroy(); } catch(e) {}
+                }
+            });
+
+            debugLog('Tap to Earn initialized');
         })();
     </script>
 </body>
-</html>
-
-                                                
-                                                                                                
+</html>   
+                                         
