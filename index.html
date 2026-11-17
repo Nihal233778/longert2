@@ -1,5 +1,4 @@
-
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,17 +6,13 @@
     <title>tads Publisher TMA · Personal blog widgets</title>
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js?61"></script>
-    <!-- tads widget (must be loaded before usage) -->
+    <!-- tads widget -->
     <script src="https://w.tads.me/widget.js"></script>
- <!eruda>
-     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
- <!install eruda>
-  <script>eruda.init();</script>
+    <!-- eruda for debugging (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             padding: 16px;
@@ -26,14 +21,12 @@
             color: var(--tg-theme-text-color, #000000);
             transition: background 0.2s ease;
         }
-
         h1 {
             font-size: 26px;
             margin-bottom: 6px;
             font-weight: 620;
             letter-spacing: -0.3px;
         }
-
         .subtitle {
             font-size: 14px;
             color: var(--tg-theme-hint-color, #8e8e93);
@@ -41,14 +34,12 @@
             border-left: 3px solid var(--tg-theme-button-color, #40a7e3);
             padding-left: 12px;
         }
-
         .quick-select {
             display: flex;
             gap: 12px;
             margin-bottom: 24px;
             flex-wrap: wrap;
         }
-
         .widget-btn {
             flex: 1;
             min-width: 140px;
@@ -63,7 +54,6 @@
             text-align: center;
             font-size: 14px;
         }
-
         .widget-btn:hover, .widget-btn.active {
             background: var(--tg-theme-button-color, #40a7e3);
             color: var(--tg-theme-button-text-color, #ffffff);
@@ -71,11 +61,7 @@
             transform: scale(0.97);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
+        .form-group { margin-bottom: 20px; }
         label {
             display: block;
             margin-bottom: 6px;
@@ -83,7 +69,6 @@
             font-weight: 500;
             color: var(--tg-theme-hint-color, #6c6c70);
         }
-
         input, select, textarea {
             width: 100%;
             padding: 12px 14px;
@@ -95,18 +80,12 @@
             font-size: 16px;
             font-family: inherit;
         }
-
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--tg-theme-button-color, #40a7e3);
             box-shadow: 0 0 0 2px rgba(64, 167, 227, 0.2);
         }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
+        textarea { resize: vertical; min-height: 80px; }
         button {
             width: 100%;
             padding: 14px 24px;
@@ -120,23 +99,13 @@
             transition: opacity 0.2s, transform 0.1s;
             margin-top: 8px;
         }
-
-        button:active {
-            opacity: 0.85;
-            transform: scale(0.98);
-        }
-
-        button:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
-
+        button:active { opacity: 0.85; transform: scale(0.98); }
+        button:disabled { opacity: 0.55; cursor: not-allowed; }
         #adSection {
             margin-top: 36px;
             padding-top: 20px;
             border-top: 1px solid var(--tg-theme-hint-color, #e5e5ea);
         }
-
         #staticAdContainer {
             min-height: 120px;
             margin: 16px 0;
@@ -144,15 +113,8 @@
             background: var(--tg-theme-secondary-bg-color, #fafafc);
             padding: 8px;
         }
-
-        #fullscreenTrigger {
-            margin-top: 16px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
+        #fullscreenTrigger { margin-top: 16px; }
+        .hidden { display: none !important; }
         .success-message {
             background: #34c759;
             color: white;
@@ -162,7 +124,6 @@
             text-align: center;
             font-weight: 500;
         }
-
         .error-message {
             background: #ff3b30;
             color: white;
@@ -171,7 +132,6 @@
             margin-bottom: 20px;
             text-align: center;
         }
-
         .info-message {
             background: #007aff;
             color: white;
@@ -180,7 +140,6 @@
             margin-bottom: 20px;
             text-align: center;
         }
-
         .debug-box {
             background: #1c1c1e;
             color: #66ff99;
@@ -194,7 +153,6 @@
             overflow-y: auto;
             border: 1px solid #2c2c2e;
         }
-
         .widget-badge {
             background: var(--tg-theme-button-color, #40a7e3);
             color: white;
@@ -210,20 +168,20 @@
 <body>
     <h1>🧪 tads Publisher Sandbox</h1>
     <div class="subtitle">
-        📋 Dashboard widgets: <strong>#13289 (Personal blog)</strong> | <strong>#13290(Personal blog1)</strong> — TGB / Fullscreen ready
+        📋 Dashboard widgets: <strong>#13287 (Personal blog)</strong> | <strong>#13288 (Personal blog1)</strong> — TGB / Fullscreen ready
     </div>
 
     <div id="debugContainer" class="debug-box hidden"></div>
 
     <div class="quick-select">
-        <div class="widget-btn" data-widget="13289" data-name="Personal blog">📰 #13289- Personal blog</div>
-        <div class="widget-btn" data-widget="13290" data-name="Personal blog1">✍️ #13290-Personal blog1</div>
+        <div class="widget-btn" data-widget="13287" data-name="Personal blog">📰 #13287 - Personal blog</div>
+        <div class="widget-btn" data-widget="13288" data-name="Personal blog1">✍️ #13288 - Personal blog1</div>
     </div>
 
     <form id="adForm">
         <div class="form-group">
             <label for="widgetId">🆔 Widget ID *</label>
-            <input type="text" id="widgetId" name="widgetId" required value="13289"placeholder="13289or13290">
+            <input type="text" id="widgetId" name="widgetId" required value="13288" placeholder="13287 or 13288">
         </div>
 
         <div class="form-group">
@@ -249,7 +207,7 @@
 
         <div class="form-group">
             <label for="description">📝 Description</label>
-            <textarea id="description" name="description">Blog widget from tads dashboard — #13287(Personal blog)</textarea>
+            <textarea id="description" name="description">Blog widget from dashboard #9642 — Personal blog (TGB)</textarea>
         </div>
 
         <button type="submit" id="submitBtn">🚀 Load Ad</button>
@@ -258,7 +216,7 @@
     <div id="adSection" class="hidden">
         <h2 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             🎯 Ad Preview 
-            <span id="activeWidgetBadge" class="widget-badge">#13289</span>
+            <span id="activeWidgetBadge" class="widget-badge">#13288</span>
         </h2>
         <div id="staticAdContainer"></div>
         <button id="fullscreenTrigger" class="hidden">✨ Show Fullscreen Ad</button>
@@ -268,12 +226,11 @@
 
     <script>
         (function() {
-            // catch unhandled rejections to avoid silent crashes
             window.addEventListener('unhandledrejection', function(event) {
                 console.error('[TADS] Unhandled promise rejection:', event.reason);
             });
 
-            // ---------- Debug logger ----------
+            // Debug logger
             function debugLog(...args) {
                 console.log('[TADS-TEST]', ...args);
                 const debugDiv = document.getElementById('debugContainer');
@@ -325,10 +282,10 @@
 
             // State
             let currentAdController = null;
-            let currentWidgetId = '13289';
+            let currentWidgetId = '13288';
             let noAdsHandled = false;
 
-            // ---------- UI Helpers ----------
+            // UI helpers
             function showMessage(type, text) {
                 const msgDiv = document.createElement('div');
                 msgDiv.className = type === 'success' ? 'success-message' : (type === 'info' ? 'info-message' : 'error-message');
@@ -360,7 +317,7 @@
                 debugLog(`Active widget switched to #${widgetId}`);
             }
 
-            // ---------- tads readiness check ----------
+            // tads readiness
             function isTadsReady() {
                 return !!(window.tads && typeof window.tads.init === 'function');
             }
@@ -387,7 +344,7 @@
                 return id.toString().replace(/^#/, '').trim();
             }
 
-            // ---------- Core ad loader (fixed container convention) ----------
+            // Core ad loader
             async function loadAd(widgetId, adType, rewardType) {
                 clearDebug();
                 debugLog(`loadAd start — widget:${widgetId}, type:${adType}, reward:${rewardType}`);
@@ -401,7 +358,7 @@
                     resetAdUI();
                     setActiveWidgetUI(normalizedId);
 
-                    // IMPORTANT: for static ads, create container with EXACT id format "tads-container-{widgetId}"
+                    // For static ads, create container with EXACT id format "tads-container-{widgetId}"
                     if (adType === 'static') {
                         const requiredContainerId = `tads-container-${normalizedId}`;
                         debugLog(`Creating static container with ID: ${requiredContainerId}`);
@@ -413,7 +370,7 @@
                         debugLog(`Container verified: ${!!containerEl}`);
                     }
 
-                    // Define callbacks
+                    // Callbacks
                     const onAdsNotFound = () => {
                         debugLog(`onAdsNotFound triggered for ${normalizedId}`);
                         if (!noAdsHandled) {
@@ -444,7 +401,7 @@
                     const controller = window.tads.init({
                         widgetId: normalizedId,
                         type: adType,
-                        debug: false,       // set to false for cleaner production, logs are handled by us
+                        debug: false,
                         onClickReward: onClickReward,
                         onShowReward: onShowReward,
                         onAdsNotFound: onAdsNotFound
@@ -463,7 +420,6 @@
                         showMessage('success', `✅ TGB ad loaded for #${normalizedId}`);
                     } 
                     else if (adType === 'fullscreen') {
-                        // fullscreen: prepare button and UI
                         staticContainer.innerHTML = '<div style="padding: 20px; text-align: center; opacity:0.7;">✨ Fullscreen ad ready — tap button below</div>';
                         fullscreenBtn.classList.remove('hidden');
                         adSection.classList.remove('hidden');
@@ -510,7 +466,7 @@
                 }
             }
 
-            // ---------- Quick select buttons (matching screenshot #9613, #9614) ----------
+            // Quick select buttons
             widgetBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const wid = btn.dataset.widget;
@@ -518,16 +474,16 @@
                     if (wid) {
                         widgetIdInput.value = wid;
                         nameInput.value = wName || '';
-                        if (wid === '13287') descInput.value = 'Blog widget from dashboard #12694 — Personal blog (TGB)';
-                        else if (wid === '13288') descInput.value = 'Blog widget from dashboard #12695- Personal blog1 (TGB)';
+                        if (wid === '13287') descInput.value = 'Blog widget from dashboard #9642 — Personal blog (TGB)';
+                        else if (wid === '13288') descInput.value = 'Blog widget from dashboard #9643 — Personal blog1 (TGB)';
                         setActiveWidgetUI(wid);
                         showMessage('success', `Selected ${wName} (#${wid})`);
-                        resetAdUI();   // clear previous ad preview
+                        resetAdUI();
                     }
                 });
             });
 
-            // ---------- Form submission ----------
+            // Form submission
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const widgetRaw = widgetIdInput.value.trim();
@@ -546,13 +502,13 @@
                 submitBtn.textContent = '🚀 Load Ad';
             });
 
-            // initial default
-            setActiveWidgetUI('13289');
-            widgetIdInput.value = '13290';
+            // Initial default state (matching screenshot)
+            setActiveWidgetUI('13288');
+            widgetIdInput.value = '13288';
             nameInput.value = 'Personal blog';
-            descInput.value = 'Blog widget from dashboard #9642— Personal blog (TGB)';
+            descInput.value = 'Blog widget from dashboard #9642 — Personal blog (TGB)';
 
-            // check tads on load
+            // Check tads on load
             window.addEventListener('load', () => {
                 debugLog('Page fully loaded');
                 waitForTads(5000).catch(e => debugLog('tads not ready after load', e.message));
@@ -561,6 +517,3 @@
     </script>
 </body>
 </html>
-
-                                                
-                                                    
